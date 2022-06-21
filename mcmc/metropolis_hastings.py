@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Metropolis-Hastings methods
 This is Metropolis-Hastings methods implementation.
-Metropolis-Hastings methods is basic algorithm for Markov Chain Monte Carlo methods.
+Metropolis-Hastings methods is basic algorithm for Markov chain Monte Carlo (MCMC) methods.
 <Reference>
 https://fisproject.jp/2015/12/mcmc-in-python/ (accessed 21 Jun 2022).
 """

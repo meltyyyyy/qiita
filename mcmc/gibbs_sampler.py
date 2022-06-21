@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+"""Gibbs Sampling
+This is Gibbs Sampling implementation.
+Gibbs sampling or a Gibbs sampler is a Markov chain Monte Carlo (MCMC) algorithm
+for obtaining a sequence of observations which are approximated
+from a specified multivariate probability distribution,
+when direct sampling is difficult.
+<Reference>
+https://research.miidas.jp/2019/12/mcmc%E5%85%A5%E9%96%80-gibbs-sampling/ (accessed 21 Jun 2022).
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.axes3d import Axes3D
