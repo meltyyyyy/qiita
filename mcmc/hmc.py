@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-a = 0
+a = 0.5
 """
 Target distributaion is 2D Gaussian Distribution,
 where mu is 0, Sigma^-1 is [1, -a][-a, 1]
