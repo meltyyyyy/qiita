@@ -12,10 +12,10 @@ import copy
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-# P(x) : Target distribution
-def P(x1, x2, a):
-    return np.exp(-0.5 * (x1**2 - 2 * a * x1 * x2 + x2**2))
+a = 0.5
+# P(z1, z2) is target distribution without regulization term.
+def P(z1, z2):
+    return np.exp(-0.5 * (z1**2 - 2 * a * z1 * z2 + z2**2))
 
 
 # Q(x) : Proposal distribution
@@ -31,16 +31,16 @@ def Q(c, mu1, mu2, sigma):
             sigma))
 
 
-def metropolis(N, mu1, mu2, sigma, b):
-    z = (10, 10)
+def metropolis(N, mu1, mu2, sigma):
+    z = (0, 0)
     sample = []
     sample.append(z)
 
     for i in range(N):
         z_new = Q(z, mu1, mu2, sigma)
 
-        T_prev = P(z[0], z[1], b)
-        T_next = P(z_new[0], z_new[1], b)
+        T_prev = P(z[0], z[1])
+        T_next = P(z_new[0], z_new[1])
         r = T_next / T_prev
 
         if r > 1 or r > np.random.uniform(0, 1):
@@ -50,26 +50,25 @@ def metropolis(N, mu1, mu2, sigma, b):
     return np.array(sample)
 
 
-a = 0.5
 mu1 = 0
 mu2 = 0
 sigma = 1
 
 N = 3000
 
-samples = metropolis(N, mu1, mu2, sigma, a)
+samples = metropolis(N, mu1, mu2, sigma)
 
 # plot scatter
 plt.figure()
 plt.scatter(samples[:, 0], samples[:, 1], s=10, c='pink', alpha=0.2,
-            edgecolor='red', label='Samples obtained by HMC method')
+            edgecolor='red', label='Samples obtained by M-H method')
 plt.plot(samples[0:30, 0], samples[0:30, 1], color='green',
          linestyle='dashed', label='First 30 samples')
 plt.scatter(samples[0, 0], samples[0, 1], s=50,
             c='b', marker='*', label='initial value')
 plt.legend(loc=4, prop={'size': 10})
-plt.title('Metropolice-Hastings method')
-plt.savefig('metropolice.png')
+plt.title('Metropolis-Hastings method')
+plt.savefig('metropolis.png')
 
 # plot distribution
 fig = plt.figure(figsize=(15, 6))
@@ -81,4 +80,4 @@ plt.title('x')
 ax = fig.add_subplot(122)
 plt.hist(samples[30:, 1], bins=30)
 plt.title('y')
-plt.savefig('hmc_dist.png')
+plt.savefig('metropolis_dist.png')
