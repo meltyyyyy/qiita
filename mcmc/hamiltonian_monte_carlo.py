@@ -9,15 +9,19 @@ https://fisproject.jp/2015/12/mcmc-in-python/ (accessed 21 Jun 2022).
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 a = 0
+"""
+Target distributaion is 2D Gaussian Distribution,
+where mu is 0, Sigma^-1 is [1, -a][-a, 1]
 
-# P(x) : Target distribution
+P(z1, z2) is target distribution without regulization term.
+"""
+def P(z1, z2):
+    return np.exp(-0.5 * (z1**2 - 2 * a * z1 * z2 + z2**2))
 
 
-def P(x1, x2):
-    return np.exp(-0.5 * (x1**2 - 2 * a * x1 * x2 + x2**2))
-
-
+# Potential energy for the object
 def U(z):
     return 0.5 * (z[0]**2 - 2 * a * z[0] * z[1] + z[1]**2)
 
@@ -26,16 +30,17 @@ def dU_dz(z):
     return (z[0] - a * z[1], z[0] - a * z[1])
 
 
+# Kinetic energy for the object
 def K(p):
     return 0.5 * (p[0]**2 + p[1]**2)
 
 
 def hamiltonian(p, z):
-    return U(z, a) + K(p)
+    return U(z) + K(p)
 
 
 def leapfrog_half_p(p, z, eps):
-    diff = dU_dz(z, a)
+    diff = dU_dz(z)
     return (p[0] - 0.5 * eps * diff[0], p[1] - 0.5 * eps * diff[1])
 
 
@@ -43,7 +48,7 @@ def leapfrog_z(p, z, eps):
     return (z[0] + eps * p[0], z[1] + eps * p[1])
 
 
-def hmc_sampler(N=30000, L=100, eps=0.01):
+def hmc_sampler(N, L=100, eps=0.01):
     samples = []
     z = (0, 0)
     p = (np.random.normal(0, 1), np.random.normal(0, 1))
@@ -71,11 +76,13 @@ def hmc_sampler(N=30000, L=100, eps=0.01):
 
         p = (np.random.normal(0, 1), np.random.normal(0, 1))
 
+    return samples
 
-samples = np.array(hmc_sampler())
 
-
+N = 30000
 burn_in = 0.2
+
+samples = np.array(hmc_sampler(N))
 
 plt.scatter(
     samples[int(len(samples) * burn_in):, 0],
@@ -84,8 +91,8 @@ plt.scatter(
     s=5,
     edgecolor='None'
 )
-plt.title('MCMC (Metropolis)')
-plt.savefig('metropolis.png')
+plt.title('Hamiltonian Monte Carlo method')
+plt.savefig('hmc_sampler.png')
 
 fig = plt.figure(figsize=(15, 6))
 
@@ -96,11 +103,4 @@ plt.title('x')
 ax = fig.add_subplot(122)
 plt.hist(samples[int(N * burn_in):, 1], bins=30)
 plt.title('y')
-plt.savefig('plot.png')
-
-print('x:', np.mean(samples[int(len(samples) * burn_in):, 0]),
-      np.var(samples[int(len(samples) * burn_in):, 0]))
-# => x: -0.00252259614386 1.26378688755
-print('y:', np.mean(samples[int(len(samples) * burn_in):, 1]),
-      np.var(samples[int(len(samples) * burn_in):, 1]))
-# => y: -0.0174372516771 1.24832585103
+plt.savefig('hmc_dist.png')
