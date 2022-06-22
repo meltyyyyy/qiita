@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """Metropolis-Hastings methods
-This is Metropolis-Hastings methods implementation.
-Metropolis-Hastings methods is basic algorithm for Markov chain Monte Carlo (MCMC) methods.
-<Reference>
-https://fisproject.jp/2015/12/mcmc-in-python/ (accessed 21 Jun 2022).
+This is Metropolis-Hastings method implementation.
+Hamiltonian Monte Carlo corresponds to an instance of the Metropolis-Hastings algorithm,
+with a Hamiltonian dynamics evolution simulated
+using a time-reversible and volume-preserving numerical integrator to propose a move
+to a new point in the state space.
 """
 
 import copy
@@ -71,7 +72,7 @@ plt.scatter(
     edgecolor='None'
 )
 plt.title('MCMC (Metropolis)')
-plt.show()
+plt.savefig('metropolis.png')
 
 fig = plt.figure(figsize=(15, 6))
 
@@ -82,7 +83,7 @@ plt.title('x')
 ax = fig.add_subplot(122)
 plt.hist(sample[int(N * burn_in):, 1], bins=30)
 plt.title('y')
-plt.show()
+plt.savefig('plot.png')
 
 print('x:', np.mean(sample[int(len(sample) * burn_in):, 0]),
       np.var(sample[int(len(sample) * burn_in):, 0]))
