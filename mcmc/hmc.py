@@ -10,17 +10,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-a = 0.5
-"""
-Target distributaion is 2D Gaussian Distribution,
-where mu is 0, Sigma^-1 is [1, -a][-a, 1]
-
-P(z1, z2) is target distribution without regulization term.
-"""
-def P(z1, z2):
-    return np.exp(-0.5 * (z1**2 - 2 * a * z1 * z2 + z2**2))
-
-
 # Potential energy for the object
 def U(z):
     return 0.5 * (z[0]**2 - 2 * a * z[0] * z[1] + z[1]**2)
@@ -79,28 +68,31 @@ def hmc_sampler(N, L=100, eps=0.01):
     return samples
 
 
-N = 30000
-burn_in = 0.2
+N = 3000
+a = 0.5
 
 samples = np.array(hmc_sampler(N))
 
-plt.scatter(
-    samples[int(len(samples) * burn_in):, 0],
-    samples[int(len(samples) * burn_in):, 1],
-    alpha=0.3,
-    s=5,
-    edgecolor='None'
-)
+# plot scatter
+plt.figure()
+plt.scatter(samples[:, 0], samples[:, 1], s=10, c='pink', alpha=0.2,
+            edgecolor='red', label='Samples obtained by HMC method')
+plt.plot(samples[0:30, 0], samples[0:30, 1], color='green',
+         linestyle='dashed', label='First 30 samples')
+plt.scatter(samples[0, 0], samples[0, 1], s=50,
+            c='b', marker='*', label='initial value')
+plt.legend(loc=4, prop={'size': 10})
 plt.title('Hamiltonian Monte Carlo method')
 plt.savefig('hmc_sampler.png')
 
+# plot distribution
 fig = plt.figure(figsize=(15, 6))
 
 ax = fig.add_subplot(121)
-plt.hist(samples[int(N * burn_in):, 0], bins=30)
+plt.hist(samples[30:, 0], bins=30)
 plt.title('x')
 
 ax = fig.add_subplot(122)
-plt.hist(samples[int(N * burn_in):, 1], bins=30)
+plt.hist(samples[30:, 1], bins=30)
 plt.title('y')
 plt.savefig('hmc_dist.png')
