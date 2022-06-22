@@ -11,7 +11,6 @@ https://research.miidas.jp/2019/12/mcmc%E5%85%A5%E9%96%80-gibbs-sampling/ (acces
 
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 
 def gibbs_sampler(a, step):
