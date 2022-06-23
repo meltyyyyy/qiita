@@ -12,8 +12,12 @@ import copy
 import numpy as np
 import matplotlib.pyplot as plt
 
+from autocorr import autocorrelation
+
 a = 0.5
 # P(z1, z2) is target distribution without regulization term.
+
+
 def P(z1, z2):
     return np.exp(-0.5 * (z1**2 - 2 * a * z1 * z2 + z2**2))
 
@@ -69,6 +73,21 @@ plt.scatter(samples[0, 0], samples[0, 1], s=50,
 plt.legend(loc=4, prop={'size': 10})
 plt.title('Metropolis-Hastings method')
 plt.savefig('metropolis.png')
+
+# plot autocorreration graph
+acorr_data = []
+for i in range(100):
+    acorr_data.append(autocorrelation(samples, i))
+acorr_data = np.asarray(acorr_data)
+plt.figure()
+markerline, stemlines, baseline = plt.stem(np.arange(
+    100), acorr_data[0:100, 0], linefmt="--", use_line_collection=True)
+markerline.set_color("red")
+markerline.set_markerfacecolor("none")
+markerline.set_markersize(2.5)
+stemlines.set_color("pink")
+baseline.set_color("orange")
+plt.savefig('metropolis_autocorr.png')
 
 # plot distribution
 fig = plt.figure(figsize=(15, 6))
