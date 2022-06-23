@@ -121,7 +121,7 @@ for x_test_idx in range(test_length):
 plt.figure(figsize=(16, 8))
 plt.title('Signal prediction by Gaussian process', fontsize=20)
 
-plt.plot(data_x, data_y, 'x', color='green', label='correct signal')
+plt.plot(data_x, data_y, 'x', color='orange', label='correct signal')
 plt.plot(
     data_x[sample_idx],
     data_y[sample_idx],
