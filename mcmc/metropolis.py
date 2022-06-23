@@ -51,11 +51,10 @@ def metropolis(N, mu1, mu2, sigma):
         if r > 1 or r > np.random.uniform(0, 1):
             z = copy.copy(z_new)
             sample.append(z)
-            accept.append(True)
+            accept.append(0)
         else:
-            accept.append(False)
-
-    rate = len(accept == 1) / len(accept)
+            accept.append(1)
+    rate = np.mean(accept)
     print(f'acceptance rate : {rate}')
     return np.array(sample)
 

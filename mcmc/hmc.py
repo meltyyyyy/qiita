@@ -41,6 +41,7 @@ def leapfrog_z(p, z, eps):
 
 def hmc_sampler(N, L=100, eps=0.01):
     samples = []
+    accept = []
     z = (0, 0)
     p = (np.random.normal(0, 1), np.random.normal(0, 1))
 
@@ -60,13 +61,18 @@ def hmc_sampler(N, L=100, eps=0.01):
         r = np.exp(prev_H - H)
         if r > 1:
             samples.append(z)
+            accept.append(1)
         elif r > 0 and np.random.uniform(0, 1) < r:
             samples.append(z)
+            accept.append(1)
         else:
             z = z_prev
+            accept.append(0)
 
         p = (np.random.normal(0, 1), np.random.normal(0, 1))
 
+    rate = np.mean(accept)
+    print(f'acceptance rate : {rate}')
     return samples
 
 
