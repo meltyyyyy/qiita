@@ -39,6 +39,7 @@ def metropolis(N, mu1, mu2, sigma):
     z = (0, 0)
     sample = []
     sample.append(z)
+    accept = []
 
     for i in range(N):
         z_new = Q(z, mu1, mu2, sigma)
@@ -50,7 +51,12 @@ def metropolis(N, mu1, mu2, sigma):
         if r > 1 or r > np.random.uniform(0, 1):
             z = copy.copy(z_new)
             sample.append(z)
+            accept.append(True)
+        else:
+            accept.append(False)
 
+    rate = len(accept == 1) / len(accept)
+    print(f'acceptance rate : {rate}')
     return np.array(sample)
 
 

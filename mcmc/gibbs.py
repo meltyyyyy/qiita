@@ -12,6 +12,8 @@ https://research.miidas.jp/2019/12/mcmc%E5%85%A5%E9%96%80-gibbs-sampling/ (acces
 import numpy as np
 import matplotlib.pyplot as plt
 
+from autocorr import autocorrelation
+
 
 def gibbs_sampler(a, step):
     z = np.zeros(2)
@@ -30,6 +32,7 @@ step = 3000
 a = 0.5
 samples = gibbs_sampler(a, step)
 
+# plot scatter
 plt.figure()
 plt.scatter(samples[:, 0], samples[:, 1], s=10, c='pink', alpha=0.2,
             edgecolor='red', label='Samples obtained by Gibbs Sampling')
@@ -40,6 +43,21 @@ plt.scatter(samples[0, 0], samples[0, 1], s=50,
 plt.legend(loc=4, prop={'size': 10})
 plt.title('Gibbs sampler')
 plt.savefig('gibbs_sampler.png')
+
+# plot autocorreration graph
+acorr_data = []
+for i in range(100):
+    acorr_data.append(autocorrelation(samples, i))
+acorr_data = np.asarray(acorr_data)
+plt.figure()
+markerline, stemlines, baseline = plt.stem(np.arange(
+    100), acorr_data[0:100, 0], linefmt="--", use_line_collection=True)
+markerline.set_color("red")
+markerline.set_markerfacecolor("none")
+markerline.set_markersize(2.5)
+stemlines.set_color("pink")
+baseline.set_color("orange")
+plt.savefig('gibbs_autocorr.png')
 
 # plot distribution
 fig = plt.figure(figsize=(15, 6))

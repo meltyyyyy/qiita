@@ -9,6 +9,8 @@ https://fisproject.jp/2015/12/mcmc-in-python/ (accessed 21 Jun 2022).
 import numpy as np
 import matplotlib.pyplot as plt
 
+from autocorr import autocorrelation
+
 
 # Potential energy for the object
 def U(z):
@@ -84,6 +86,21 @@ plt.scatter(samples[0, 0], samples[0, 1], s=50,
 plt.legend(loc=4, prop={'size': 10})
 plt.title('Hamiltonian Monte Carlo method')
 plt.savefig('hmc_sampler.png')
+
+# plot autocorreration graph
+acorr_data = []
+for i in range(100):
+    acorr_data.append(autocorrelation(samples, i))
+acorr_data = np.asarray(acorr_data)
+plt.figure()
+markerline, stemlines, baseline = plt.stem(np.arange(
+    100), acorr_data[0:100, 0], linefmt="--", use_line_collection=True)
+markerline.set_color("red")
+markerline.set_markerfacecolor("none")
+markerline.set_markersize(2.5)
+stemlines.set_color("pink")
+baseline.set_color("orange")
+plt.savefig('hmc_autocorr.png')
 
 # plot distribution
 fig = plt.figure(figsize=(15, 6))
