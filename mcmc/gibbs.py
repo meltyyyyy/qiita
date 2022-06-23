@@ -67,6 +67,6 @@ plt.hist(samples[30:, 0], bins=30)
 plt.title('x')
 
 ax = fig.add_subplot(122)
-plt.hist(samples[30:, 1], bins=30)
+plt.hist(samples[30:, 1], bins=30, color="g")
 plt.title('y')
 plt.savefig('gibbs_dist.png')

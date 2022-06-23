@@ -25,29 +25,6 @@ sample_idx = np.sort(
         np.arange(n), int(
             n * missing_rate), replace=False))
 
-plt.figure(figsize=(12, 5))
-plt.title('signal data', fontsize=20)
-
-# original signals
-plt.plot(data_x, data_y, 'x', color='green', label='correct signal')
-
-# sample signal
-plt.plot(
-    data_x[sample_idx],
-    data_y[sample_idx],
-    'o',
-    color='red',
-    label='sample dots')
-
-plt.legend(
-    bbox_to_anchor=(
-        1.05,
-        1),
-    loc='upper left',
-    borderaxespad=0,
-    fontsize=12)
-plt.savefig('signal.png')
-
 
 def kernel(x, x_prime, p, q, r):
     """Kernel Function
