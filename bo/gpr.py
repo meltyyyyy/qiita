@@ -2,27 +2,28 @@
 """Gaussian Process Regression
 This is Gaussian Process Regression implementation.
 Gaussian Process is a stochastic process,
-such that every finite collection of those random variables has a multivariate normal distribution
+such that every finite collection of those random variables has a multivariate normal distribution.
 """
 
 import numpy as np
 from matplotlib import pyplot as plt
 
-DATA_FIG = 'signal.png'
-OUTPUT_FIG = 'gpr.png'
 
-# original data
+def objective(x):
+    return 2 * np.sin(x) + 3 * np.cos(2 * x) + 5 * \
+        np.sin(2 / 3 * x) + np.random.randn(len(x))
+
+
 n = 100
 data_x = np.linspace(0, 4 * np.pi, n)
-data_y = 2 * np.sin(data_x) + 3 * np.cos(2 * data_x) + 5 * \
-    np.sin(2 / 3 * data_x) + np.random.randn(len(data_x))
+data_y = objective(data_x)
 
-# make sample data
-missing_value_rate = 0.2
-sample_index = np.sort(
+
+missing_rate = 0.2
+sample_idx = np.sort(
     np.random.choice(
         np.arange(n), int(
-            n * missing_value_rate), replace=False))
+            n * missing_rate), replace=False))
 
 plt.figure(figsize=(12, 5))
 plt.title('signal data', fontsize=20)
@@ -32,8 +33,8 @@ plt.plot(data_x, data_y, 'x', color='green', label='correct signal')
 
 # sample signal
 plt.plot(
-    data_x[sample_index],
-    data_y[sample_index],
+    data_x[sample_idx],
+    data_y[sample_idx],
     'o',
     color='red',
     label='sample dots')
@@ -45,21 +46,19 @@ plt.legend(
     loc='upper left',
     borderaxespad=0,
     fontsize=12)
-plt.savefig(DATA_FIG)
+plt.savefig('signal.png')
 
 
 def kernel(x, x_prime, p, q, r):
-    """Radial Basis Function
+    """Kernel Function
 
     Args:
-        x (_type_): _description_
-        x_prime (_type_): _description_
-        p (_type_): hyper parameter
-        q (_type_): hyper parameter
-        r (_type_): error
+        x (float): data
+        x_prime (float): data
+        p (float): hyper parameter
+        q (float): hyper parameter
+        r (float): error
 
-    Returns:
-        _type_: _description_
     """
     if x == x_prime:
         delta = 1
@@ -70,8 +69,8 @@ def kernel(x, x_prime, p, q, r):
 
 
 # training data
-x_train = np.copy(data_x[sample_index])
-y_train = np.copy(data_y[sample_index])
+x_train = np.copy(data_x[sample_idx])
+y_train = np.copy(data_y[sample_idx])
 
 # test data
 x_test = np.copy(data_x)
@@ -88,6 +87,7 @@ Theta_3 = 0.1
 
 train_length = len(x_train)
 test_length = len(x_test)
+
 
 K = np.zeros((train_length, train_length))
 for x_idx in range(train_length):
@@ -119,26 +119,26 @@ for x_test_idx in range(test_length):
     var.append(s - np.dot(kK_, k.T))
 
 plt.figure(figsize=(16, 8))
-plt.title('signal prediction by Gaussian process', fontsize=20)
+plt.title('Signal prediction by Gaussian process', fontsize=20)
 
 plt.plot(data_x, data_y, 'x', color='green', label='correct signal')
 plt.plot(
-    data_x[sample_index],
-    data_y[sample_index],
+    data_x[sample_idx],
+    data_y[sample_idx],
     'o',
     color='red',
     label='sample dots')
 
 std = np.sqrt(np.abs(var))
 
-plt.plot(x_test, mu, color='blue', label='mean by Gaussian process')
+plt.plot(x_test, mu, color='red', label='Mean by Gaussian process')
 plt.fill_between(
     x_test,
     mu + 2 * std,
     mu - 2 * std,
     alpha=.2,
-    color='blue',
-    label='standard deviation by Gaussian process')
+    color='pink',
+    label='Standard deviation by Gaussian process')
 
 plt.legend(
     bbox_to_anchor=(
@@ -147,4 +147,4 @@ plt.legend(
     loc='upper left',
     borderaxespad=0,
     fontsize=12)
-plt.savefig(OUTPUT_FIG)
+plt.savefig('gpr.png')
