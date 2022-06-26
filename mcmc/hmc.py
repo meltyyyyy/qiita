@@ -106,6 +106,7 @@ markerline.set_markerfacecolor("none")
 markerline.set_markersize(2.5)
 stemlines.set_color("pink")
 baseline.set_color("orange")
+plt.title('Hamiltonian Monte Carlo Autocorrelation')
 plt.savefig('hmc_autocorr.png')
 
 # plot distribution
@@ -118,4 +119,5 @@ plt.title('x')
 ax = fig.add_subplot(122)
 plt.hist(samples[30:, 1], bins=30, color="g")
 plt.title('y')
+plt.title('Hamiltonian Monte Carlo Distribution')
 plt.savefig('hmc_dist.png')

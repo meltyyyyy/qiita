@@ -41,7 +41,7 @@ plt.plot(samples[0:30, 0], samples[0:30, 1], color='green',
 plt.scatter(samples[0, 0], samples[0, 1], s=50,
             c='b', marker='*', label='initial value')
 plt.legend(loc=4, prop={'size': 10})
-plt.title('Gibbs sampler')
+plt.title('Gibbs Sampler')
 plt.savefig('gibbs_sampler.png')
 
 # plot autocorreration graph
@@ -57,6 +57,7 @@ markerline.set_markerfacecolor("none")
 markerline.set_markersize(2.5)
 stemlines.set_color("pink")
 baseline.set_color("orange")
+plt.title('Gibbs Sampler Autocorrelation')
 plt.savefig('gibbs_autocorr.png')
 
 # plot distribution
@@ -69,4 +70,5 @@ plt.title('x')
 ax = fig.add_subplot(122)
 plt.hist(samples[30:, 1], bins=30, color="g")
 plt.title('y')
+plt.title('Gibbs Sampler Distribution')
 plt.savefig('gibbs_dist.png')

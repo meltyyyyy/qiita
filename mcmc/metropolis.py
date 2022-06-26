@@ -92,6 +92,7 @@ markerline.set_markerfacecolor("none")
 markerline.set_markersize(2.5)
 stemlines.set_color("pink")
 baseline.set_color("orange")
+plt.title('Metropolis-Hastings Autocorrelation')
 plt.savefig('metropolis_autocorr.png')
 
 # plot distribution
@@ -104,4 +105,5 @@ plt.title('x')
 ax = fig.add_subplot(122)
 plt.hist(samples[30:, 1], bins=30,  color="g")
 plt.title('y')
+plt.title('Metropolis-Hastings Distribution')
 plt.savefig('metropolis_dist.png')
