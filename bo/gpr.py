@@ -20,7 +20,7 @@ def train_test_split(x, y, test_size):
     n_samples = len(x)
     test_indices = np.sort(
         np.random.choice(
-            np.arange(n), int(
+            np.arange(n_samples), int(
                 n_samples * test_size), replace=False))
     train_indices = np.ones(n_samples, dtype=bool)
     train_indices[test_indices] = False
@@ -93,7 +93,7 @@ def gpr(x_train, y_train, x_test, kernel):
         mu.append(np.dot(k, yy))
         kK_ = np.dot(k, np.linalg.inv(K))
         var.append(s - np.dot(kK_, k.T))
-    return mu, var
+    return np.array(mu), np.array(var)
 
 
 # Radiant Basis Kernel

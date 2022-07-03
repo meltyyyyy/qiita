@@ -16,7 +16,8 @@ def objective(x):
 
 # Upper Confidencce Bound
 def UCB(mu, var, trial):
-    k = np.sqrt(np.log(trial) / trial)
+    eps = 1e-3
+    k = np.sqrt(np.abs(np.log(trial + eps)) / (trial + eps))
     return mu + k * var
 
 
