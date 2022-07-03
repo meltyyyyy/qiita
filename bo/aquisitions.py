@@ -14,7 +14,7 @@ def objective(x):
     return 2 * np.sin(x) + 3 * np.cos(2 * x) + 5 * np.sin(2 / 3 * x)
 
 
-# Upper Confidencce Bound
+# Upper Confidence Bound
 def UCB(mu, var, trial):
     eps = 1e-3
     k = np.sqrt(np.abs(np.log(trial + eps)) / (trial + eps))
