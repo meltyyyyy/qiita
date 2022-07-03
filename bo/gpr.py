@@ -96,13 +96,13 @@ def gpr(x_train, y_train, x_test, kernel):
     return mu, var
 
 
-# Radiant Basis Kernel
-kernel = lambda x, x_prime : rbf(x, x_prime, theta_1=1.0, theta_2=1.0)
+# # Radiant Basis Kernel
+# kernel = lambda x, x_prime : rbf(x, x_prime, theta_1=1.0, theta_2=1.0)
 # # Periodic Kernel
 # kernel = lambda x, x_prime : periodic(x, x_prime, theta_1=1.0, theta_2=1.0)
-# # Exponential Kernel
-# kernel = lambda x, x_prime : exp(x, x_prime, theta=1.0)
-# # Radiant Basis Kernel
+# Exponential Kernel
+kernel = lambda x, x_prime : exp(x, x_prime, theta=1.0)
+# # Linear Kernel
 # kernel = lambda x, x_prime : linear(x, x_prime, theta=1.0)
 
 
