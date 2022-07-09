@@ -28,23 +28,23 @@ plt.close()
 
 # plot temprature
 n_iter = 100
-temp = np.array([])
-T = 1.
-def cool(T): return .90 * T
+rates = [0.90, 0.95, 0.99]
+fig, axes = plt.subplots(nrows=1, ncols=3, tight_layout=True, **{"figsize": (24, 8)})
+fig.suptitle('Cooling schedule', fontsize=18)
+for i, rate in enumerate(rates):
+    temp = np.array([])
+    T = 1.
+    def cool(T): return rate * T
+    for j in range(n_iter):
+        T = cool(T)
+        temp = np.append(temp, T)
+    axes[i].plot(temp, label=f'rate: {rate}')
+    axes[i].set_xlabel('Iteration')
+    axes[i].set_ylabel('Temprature')
+    axes[i].set_xlim([-5, 105])
+    axes[i].set_ylim([-0.1, 1.1])
 
-
-temp = np.append(temp, T)
-for i in range(n_iter):
-    T = cool(T)
-    temp = np.append(temp, T)
-
-plt.figure()
-plt.title('Cooling schedule', fontsize=14)
-plt.plot(temp, label='temprature')
-plt.xlabel('Iteration')
-plt.ylabel('Temprature')
-plt.savefig('temprature.png')
-plt.close()
+fig.savefig('temprature.png')
 
 
 # metropolise criterion on each temprature
@@ -55,11 +55,11 @@ def cool(T): return .99 * T
 
 plt.figure()
 plt.title('Criteria', fontsize=14)
-for diff in [0.3, 0.1, 0.3, 1.0, 3.0]:
+for diff in [0.03, 0.1, 0.3, 1.0, 3.0]:
     metro = np.array([])
     for i in range(n_iter):
         T = cool(T)
-        criteion = np.exp(diff / T)
+        criteion = np.exp(- diff / T)
         metro = np.append(metro, criteion)
     plt.plot(metro, label=f'{diff}')
 plt.xlabel('Iteration')
