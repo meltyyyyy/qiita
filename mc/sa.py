@@ -97,7 +97,7 @@ def simulated_annealinng(objective, cooling_rate, n_iter):
         T = cool(T)
 
         index = np.random.choice(n, 1)
-        new_x = data_x(index)
+        new_x = data_x[index]
         new_obj = objective(new_x)
 
         # update current solution iterate
@@ -116,3 +116,8 @@ def simulated_annealinng(objective, cooling_rate, n_iter):
         obj_iter[i] = best_obj
 
     return x_iter, obj_iter
+
+
+x_iter, obj_iter = simulated_annealinng(objective, cooling_rate=0.9, n_iter=100)
+best_index = np.argmax(obj_iter)
+print("best x: {}, best objective: {}".format(x_iter[best_index], obj_iter[best_index]))
