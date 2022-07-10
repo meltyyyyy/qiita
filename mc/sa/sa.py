@@ -5,6 +5,7 @@ Simulated Annealing (SA) is a probabilistic technique
 for approximating the global optimum of a given function.
 """
 
+from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('seaborn-pastel')
@@ -118,7 +119,7 @@ def simulated_annealinng(objective, cooling_rate, n_iter):
 
         # update current solution iterate
         if (new_obj > curr_obj) or (np.random.rand()
-                                   < np.exp((new_obj - curr_obj) / T)):
+                                    < np.exp((new_obj - curr_obj) / T)):
             curr_x = new_x
             curr_obj = new_obj
 
@@ -136,13 +137,13 @@ def simulated_annealinng(objective, cooling_rate, n_iter):
     return x_iter, obj_iter
 
 
-x_iter, obj_iter = simulated_annealinng(objective, cooling_rate=0.9, n_iter=100)
+x_iter, obj_iter = simulated_annealinng(
+    objective, cooling_rate=0.9, n_iter=100)
 best_index = np.argmax(obj_iter)
-print("best x: {}, best objective: {}".format(x_iter[best_index], obj_iter[best_index]))
+print("best x: {}, best objective: {}".format(
+    x_iter[best_index], obj_iter[best_index]))
 
-
-from PIL import Image
-
+# create gif
 pictures = []
 
 for i in range(n_iter):
