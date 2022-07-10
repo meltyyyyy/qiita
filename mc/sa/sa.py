@@ -23,6 +23,9 @@ data_y = objective(data_x)
 plt.figure(figsize=(16, 8))
 plt.title('Objective', fontsize=20)
 plt.plot(data_x, data_y, label='objective')
+# plt.text(3.6, 7.2, 'global optima', fontdict={'fontsize': 16, 'fontweight': 'bold'})
+# plt.text(4.8, -0.4, 'local optima', fontdict={'fontsize': 16, 'fontweight': 'bold'})
+# plt.text(8.0, 3.6, 'local optima', fontdict={'fontsize': 16, 'fontweight': 'bold'})
 plt.savefig('objective.png')
 plt.close()
 
@@ -78,6 +81,7 @@ for i, rate in enumerate(rates):
 fig.savefig('metropolise.png')
 
 
+# implementation of simulated annealing
 def plot_sa(iter, curr_x, curr_obj, new_x, new_y):
     plt.figure(figsize=(24, 8))
     plt.title('Simulated Annealing', fontsize=20)
