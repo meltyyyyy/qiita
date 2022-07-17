@@ -4,6 +4,7 @@ import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import matplotlib.pyplot as plt
 import numpy as np
+from tqdm import tqdm
 from kernels import rbf, periodic, exp, linear
 plt.style.use('seaborn-pastel')
 
@@ -64,7 +65,7 @@ def plot_gpr(x_train, y_train, x_test, mu, var):
 
 
 # Radiant Basis Kernel + Error
-def kernel(x, x_prime, theta_1=1.0, theta_2=1.0, theta_3=1.0):
+def kernel(x, x_prime, theta_1, theta_2, theta_3):
     # delta function
     if x == x_prime:
         delta = theta_3
@@ -89,7 +90,7 @@ def optimize(x_train, y_train, bounds, n_iter=1000):
                 K[x_idx, x_prime_idx] = kernel(
                     x_train[x_idx], x_train[x_prime_idx], theta_1=theta_1, theta_2=theta_2, theta_3=theta_3)
 
-        y = np.atleast_2d(y_train)
+        y = y_train
         yy = np.dot(np.linalg.inv(K), y_train)
         return - (np.linalg.slogdet(K)[1] + np.dot(y, yy))
 
@@ -108,12 +109,12 @@ def optimize(x_train, y_train, bounds, n_iter=1000):
         next_thetas = np.exp(next_log_thetas)
         lml_next = log_marginal_likelihood(theta_1=next_thetas[0], theta_2=next_thetas[1], theta_3=next_thetas[2])
         r = np.exp(lml_next - lml_prev)
-        if r > 1 or r > np.random.uniform(0, 1):
+        if r > 1 or r > np.random.random():
             thetas = next_thetas
             lml_prev = lml_next
             thetas_list.append(thetas)
             lml_list.append(lml_prev)
-    return np.exp(thetas_list[np.argmax(lml_list)])
+    return thetas_list[np.argmax(lml_list)]
 
 
 def gpr(x_train, y_train, x_test):
@@ -126,6 +127,7 @@ def gpr(x_train, y_train, x_test):
     test_length = len(x_test)
 
     thetas = optimize(x_train, y_train, bounds=np.array([[1e-2, 1e2], [1e-2, 1e2], [1e-2, 1e2]]))
+    print(thetas)
 
     K = np.zeros((train_length, train_length))
     for x_idx in range(train_length):
@@ -140,10 +142,10 @@ def gpr(x_train, y_train, x_test):
         for x_idx in range(train_length):
             k[x_idx] = kernel(
                 x_train[x_idx],
-                x_test[x_test_idx])
+                x_test[x_test_idx], theta_1=thetas[0], theta_2=thetas[1], theta_3=thetas[2])
         s = kernel(
             x_test[x_test_idx],
-            x_test[x_test_idx])
+            x_test[x_test_idx], theta_1=thetas[0], theta_2=thetas[1], theta_3=thetas[2])
         mu.append(np.dot(k, yy))
         kK_ = np.dot(k, np.linalg.inv(K))
         var.append(s - np.dot(kK_, k.T))
