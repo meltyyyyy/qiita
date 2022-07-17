@@ -7,8 +7,8 @@ f(x) is difficult to evaluate due to its computational cost.
 
 
 from aquisitions import UCB, PI, EI
-from gpr import train_test_split, gpr
-from kernels import rbf, periodic, exp, linear
+from gp.gpr import train_test_split, gpr
+from gp.kernels import rbf, periodic, exp, linear
 import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('seaborn-pastel')

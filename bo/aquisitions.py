@@ -5,8 +5,8 @@ from scipy.stats import norm
 import numpy as np
 import matplotlib.pyplot as plt
 
-from gpr import train_test_split, gpr
-from kernels import rbf, periodic, exp, linear
+from gp.gpr import train_test_split, gpr
+from gp.kernels import rbf, periodic, exp, linear
 plt.style.use('seaborn-pastel')
 
 
