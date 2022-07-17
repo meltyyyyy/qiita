@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from kernels import rbf, periodic, exp, linear
+
+from ..kernels import rbf, periodic, exp, linear
 import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('seaborn-pastel')
@@ -61,6 +62,8 @@ def plot_gpr(x_train, y_train, x_test, mu, var):
     plt.savefig('gpr.png')
 
 
+
+
 def gpr(x_train, y_train, x_test, kernel):
     # average
     mu = []
@@ -69,6 +72,8 @@ def gpr(x_train, y_train, x_test, kernel):
 
     train_length = len(x_train)
     test_length = len(x_test)
+
+
 
     K = np.zeros((train_length, train_length))
     for x_idx in range(train_length):
@@ -93,15 +98,9 @@ def gpr(x_train, y_train, x_test, kernel):
     return np.array(mu), np.array(var)
 
 
-# Radiant Basis Kernel
+# Radiant Basis Kernel + Error
 def kernel(x, x_prime):
     return rbf(x, x_prime, theta_1=1.0, theta_2=1.0)
-# # Periodic Kernel
-# kernel = lambda x, x_prime : periodic(x, x_prime, theta_1=1.0, theta_2=1.0)
-# # Exponential Kernel
-# kernel = lambda x, x_prime : exp(x, x_prime, theta=1.0)
-# # Linear Kernel
-# kernel = lambda x, x_prime : linear(x, x_prime, theta=1.0)
 
 
 mu, var = gpr(x_train, y_train, x_test, kernel)
