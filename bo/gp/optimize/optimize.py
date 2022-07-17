@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Gaussian Process Regression
-This is Gaussian Process Regression implementation.
-Gaussian Process is a stochastic process,
-such that every finite collection of those random variables has a multivariate normal distribution.
-"""
 
 from kernels import rbf, periodic, exp, linear
 import numpy as np
