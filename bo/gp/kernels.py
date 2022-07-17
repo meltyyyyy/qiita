@@ -83,22 +83,7 @@ def exp(x, x_prime, theta):
 
 if __name__ == "__main__":
     plot_kernel(lambda x, x_prime: rbf(x, x_prime, 0.5, 0.5), 'RBF Kernel')
-    plot_kernel(
-        lambda x,
-        x_prime: periodic(
-            x,
-            x_prime,
-            0.5,
-            0.5),
-        'Periodic Kernel')
+    plot_kernel(lambda x, x_prime: periodic(x, x_prime, 0.5, 0.5), 'Periodic Kernel')
     plot_kernel(lambda x, x_prime: linear(x, x_prime, 0.5), 'Linear Kernel')
-    plot_kernel(
-        lambda x,
-        x_prime: rbf(
-            x,
-            x_prime,
-            0.5,
-            0.5),
-        'Exponential Kernel')
-    plot_kernel(lambda x, x_prime: 0.8 * exp(x, x_prime, 0.5) + 0.2 *
-                periodic(x, x_prime, 0.5, 0.5), 'Exponential + Periodic Kernel')
+    plot_kernel(lambda x, x_prime: rbf(x, x_prime, 0.5, 0.5), 'Exponential Kernel')
+    plot_kernel(lambda x, x_prime: 0.8 * exp(x, x_prime, 0.5) + 0.2 * periodic(x, x_prime, 0.5, 0.5), 'Exponential + Periodic Kernel')
