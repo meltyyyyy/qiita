@@ -65,9 +65,9 @@ def plot_gpr(x_train, y_train, x_test, mu, var):
 
 
 # Radiant Basis Kernel + Error
-def kernel(x, x_prime, theta_1, theta_2, theta_3):
+def kernel(x, x_prime, theta_1, theta_2, theta_3, noise):
     # delta function
-    if x == x_prime:
+    if noise:
         delta = theta_3
     else:
         delta = 0
@@ -87,8 +87,8 @@ def optimize(x_train, y_train, bounds, n_iter=1000):
         K = np.zeros((train_length, train_length))
         for x_idx in range(train_length):
             for x_prime_idx in range(train_length):
-                K[x_idx, x_prime_idx] = kernel(
-                    x_train[x_idx], x_train[x_prime_idx], theta_1=theta_1, theta_2=theta_2, theta_3=theta_3)
+                K[x_idx, x_prime_idx] = kernel(x_train[x_idx], x_train[x_prime_idx],
+                                               theta_1, theta_2, theta_3, x_idx == x_prime_idx)
 
         y = y_train
         yy = np.dot(np.linalg.inv(K), y_train)
@@ -100,11 +100,15 @@ def optimize(x_train, y_train, bounds, n_iter=1000):
     lml_list = []
     for _ in range(n_iter):
         next_log_thetas = np.random.normal(0, scale, size=len(thetas))
-        need_resample = (log_thetas + next_log_thetas < log_bounds[:, 0]) | (log_thetas + next_log_thetas > log_bounds[:, 1])
+        need_resample = (log_thetas +
+                         next_log_thetas < log_bounds[:, 0]) | (log_thetas +
+                                                                next_log_thetas > log_bounds[:, 1])
 
         while(np.any(need_resample)):
             next_log_thetas[need_resample] = np.random.normal(0, scale, size=len(thetas))[need_resample]
-            need_resample = (log_thetas + next_log_thetas < log_bounds[:, 0]) | (log_thetas + next_log_thetas > log_bounds[:, 1])
+            need_resample = (log_thetas +
+                             next_log_thetas < log_bounds[:, 0]) | (log_thetas +
+                                                                    next_log_thetas > log_bounds[:, 1])
 
         next_thetas = np.exp(next_log_thetas)
         lml_next = log_marginal_likelihood(theta_1=next_thetas[0], theta_2=next_thetas[1], theta_3=next_thetas[2])
@@ -133,7 +137,7 @@ def gpr(x_train, y_train, x_test):
     for x_idx in range(train_length):
         for x_prime_idx in range(train_length):
             K[x_idx, x_prime_idx] = kernel(
-                x_train[x_idx], x_train[x_prime_idx], theta_1=thetas[0], theta_2=thetas[1], theta_3=thetas[2])
+                x_train[x_idx], x_train[x_prime_idx], thetas[0], thetas[1], thetas[2], x_idx == x_prime_idx)
 
     yy = np.dot(np.linalg.inv(K), y_train)
 
@@ -142,10 +146,10 @@ def gpr(x_train, y_train, x_test):
         for x_idx in range(train_length):
             k[x_idx] = kernel(
                 x_train[x_idx],
-                x_test[x_test_idx], theta_1=thetas[0], theta_2=thetas[1], theta_3=thetas[2])
+                x_test[x_test_idx], thetas[0], thetas[1], thetas[2], x_idx == x_prime_idx)
         s = kernel(
             x_test[x_test_idx],
-            x_test[x_test_idx], theta_1=thetas[0], theta_2=thetas[1], theta_3=thetas[2])
+            x_test[x_test_idx], thetas[0], thetas[1], thetas[2], x_idx == x_prime_idx)
         mu.append(np.dot(k, yy))
         kK_ = np.dot(k, np.linalg.inv(K))
         var.append(s - np.dot(kK_, k.T))
