@@ -82,7 +82,7 @@ def kernel(x, x_prime, theta_1, theta_2, theta_3, eval_grad=False):
     return rbf(x, x_prime, theta_1=theta_1, theta_2=theta_2) + delta
 
 
-def optimize(x_train, y_train, bounds, n_iter=1000):
+def optimize(x_train, y_train, bounds):
     initial_thetas = np.array([1.0, 1.0, 1.0])
     bounds = np.atleast_2d(bounds)
 
@@ -101,24 +101,26 @@ def optimize(x_train, y_train, bounds, n_iter=1000):
     def log_likelihood_gradient(theta_1, theta_2, theta_3):
         train_length = len(x_train)
         K = np.zeros((train_length, train_length))
-        dK_dTheta = np.zeros((train_length, train_length))
+        dK_dTheta = np.zeros((3, train_length, train_length))
         for x_idx in range(train_length):
             for x_prime_idx in range(train_length):
                 k, grad = kernel(
                     x_train[x_idx], x_train[x_prime_idx], theta_1=theta_1, theta_2=theta_2, theta_3=theta_3, eval_grad=True)
                 K[x_idx, x_prime_idx] = k
-                dK_dTheta = grad
+                dK_dTheta[0, x_idx, x_prime_idx] = grad[0]
+                dK_dTheta[1, x_idx, x_prime_idx] = grad[1]
+                dK_dTheta[2, x_idx, x_prime_idx] = grad[2]
 
         y = y_train
         K_inv = np.linalg.inv(K)
         yy = np.dot(K_inv, y)
 
-        tr = np.trace(np.dot(K_inv, dK_dTheta))
-        return -tr + np.dot(yy.T, np.dot(dK_dTheta, yy))
+        tr = np.trace(np.array([np.dot(K_inv, dK_dTheta[0, :, :]), np.dot(K_inv, dK_dTheta[1, :, :]), np.dot(K_inv, dK_dTheta[2, :, :])]), axis1=1, axis2=2)
+        return -tr + np.array([np.dot(yy.T, np.dot(dK_dTheta[0, :, :], yy)), np.dot(yy.T, np.dot(dK_dTheta[1, :, :], yy)), np.dot(yy.T, np.dot(dK_dTheta[2, :, :], yy))])
 
-    def obj_func(theta_1, theta_2, theta_3):
-        lml = log_marginal_likelihood(theta_1, theta_2, theta_3)
-        grad = log_likelihood_gradient(theta_1, theta_2, theta_3)
+    def obj_func(thetas):
+        lml = log_marginal_likelihood(thetas[0], thetas[1], thetas[2])
+        grad = log_likelihood_gradient(thetas[0], thetas[1], thetas[2])
         return -lml, -grad
 
     opt_res = scipy.optimize.minimize(
@@ -141,7 +143,7 @@ def gpr(x_train, y_train, x_test):
     train_length = len(x_train)
     test_length = len(x_test)
 
-    thetas = optimize(x_train, y_train, bounds=np.array([[1e-2, 1e2], [1e-2, 1e2], [1e-2, 1e2]]))
+    thetas, func_min = optimize(x_train, y_train, bounds=np.array([[1e-2, 1e2], [1e-2, 1e2], [1e-2, 1e2]]))
     print(thetas)
 
     K = np.zeros((train_length, train_length))
