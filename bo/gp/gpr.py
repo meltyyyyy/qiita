@@ -79,7 +79,7 @@ def gpr(x_train, y_train, x_test, kernel):
     for x_idx in range(train_length):
         for x_prime_idx in range(train_length):
             K[x_idx, x_prime_idx] = kernel(
-                x_train[x_idx], x_train[x_prime_idx])
+                x_train[x_idx], x_train[x_prime_idx], x_idx == x_prime_idx)
 
     yy = np.dot(np.linalg.inv(K), y_train)
 
@@ -88,26 +88,37 @@ def gpr(x_train, y_train, x_test, kernel):
         for x_idx in range(train_length):
             k[x_idx] = kernel(
                 x_train[x_idx],
-                x_test[x_test_idx])
+                x_test[x_test_idx],
+                x_idx == x_test_idx)
         s = kernel(
             x_test[x_test_idx],
-            x_test[x_test_idx])
+            x_test[x_test_idx],
+            x_test_idx == x_test_idx)
         mu.append(np.dot(k, yy))
         kK_ = np.dot(k, np.linalg.inv(K))
         var.append(s - np.dot(kK_, k.T))
     return np.array(mu), np.array(var)
 
 
-# Radiant Basis Kernel
-def kernel(x, x_prime):
-    return rbf(x, x_prime, theta_1=1.0, theta_2=1.0)
-# # Periodic Kernel
-# kernel = lambda x, x_prime : periodic(x, x_prime, theta_1=1.0, theta_2=1.0)
-# # Exponential Kernel
-# kernel = lambda x, x_prime : exp(x, x_prime, theta=1.0)
-# # Linear Kernel
-# kernel = lambda x, x_prime : linear(x, x_prime, theta=1.0)
+if __name__ == "__main__":
+    # # Radiant Basis Kernel
+    # def kernel(x, x_prime):
+    #     return rbf(x, x_prime, theta_1=0.1, theta_2=0.1)
+    # # Periodic Kernel
+    # kernel = lambda x, x_prime : periodic(x, x_prime, theta_1=1.0, theta_2=1.0)
+    # # Exponential Kernel
+    # kernel = lambda x, x_prime : exp(x, x_prime, theta=1.0)
+    # # Linear Kernel
+    # kernel = lambda x, x_prime : linear(x, x_prime, theta=1.0)
+    # Radiant Basis Kernel + Error
+    def kernel(x, x_prime, noise, theta_1=0.5, theta_2=0.5, theta_3=0.5):
+        # delta function
+        if noise:
+            delta = theta_3
+        else:
+            delta = 0
 
+        return rbf(x, x_prime, theta_1=theta_1, theta_2=theta_2) + delta
 
-mu, var = gpr(x_train, y_train, x_test, kernel)
-plot_gpr(x_train, y_train, x_test, mu, var)
+    mu, var = gpr(x_train, y_train, x_test, kernel)
+    plot_gpr(x_train, y_train, x_test, mu, var)
