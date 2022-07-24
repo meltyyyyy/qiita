@@ -140,7 +140,8 @@ def gpr(x_train, y_train, x_test):
     train_length = len(x_train)
     test_length = len(x_test)
 
-    thetas = optimize(x_train, y_train, bounds=np.array([[1e-2, 1e2], [1e-2, 1e2], [1e-2, 1e2]]))
+    thetas = optimize(x_train, y_train, bounds=np.array(
+        [[1e-2, 1e2], [1e-2, 1e2], [1e-2, 1e2]]), initial_params=np.array([0.5, 0.5, 0.5]))
     print(thetas)
 
     K = np.zeros((train_length, train_length))
