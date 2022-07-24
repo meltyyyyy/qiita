@@ -4,7 +4,7 @@
 
 ## 【MCMC】メトロポリス・ヘイスティングス法、ハミルトニアンモンテカルロ法、ギブスサンプリングを比較する
 
-マルコフ連鎖モンテカルロ法(Markov chain Monte Carlo methods)を用いたサンプリングアルゴリズム(M-H法、HMC法、ギブスサンプリング)を紹介しました。
+マルコフ連鎖モンテカルロ法(Markov chain Monte Carlo methods)を用いたサンプリングアルゴリズム(M-H法、HMC法、ギブスサンプリング)を紹介しました。2次元ガウス分布を目標分布として、3つのアルゴリズムの振る舞いや性能を比較しました。
 
 https://qiita.com/meltyyyyy/items/b04e5c13a0ea71c2be05
 
