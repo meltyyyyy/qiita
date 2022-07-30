@@ -114,7 +114,6 @@ def optimize(x_train, y_train, bounds, initial_params=np.ones(3)):
         train_length = len(x_train)
         K = np.zeros((train_length, train_length))
         dK_dTheta = np.zeros((3, train_length, train_length))
-        # dK_dTheta = np.zeros((train_length, train_length, 3))
         for x_idx in range(train_length):
             for x_prime_idx in range(train_length):
                 k, grad = kernel(x_train[x_idx], x_train[x_prime_idx], params[0],
@@ -123,20 +122,14 @@ def optimize(x_train, y_train, bounds, initial_params=np.ones(3)):
                 dK_dTheta[0, x_idx, x_prime_idx] = grad[0]
                 dK_dTheta[1, x_idx, x_prime_idx] = grad[1]
                 dK_dTheta[2, x_idx, x_prime_idx] = grad[2]
-                # dK_dTheta[x_idx, x_prime_idx, 0] = grad[0]
-                # dK_dTheta[x_idx, x_prime_idx, 1] = grad[1]
-                # dK_dTheta[x_idx, x_prime_idx, 2] = grad[2]
 
         L_ = cholesky(K, lower=True)
         alpha_ = cho_solve((L_, True), y_train)
         K_inv = cho_solve((L_, True), np.eye(K.shape[0]))
         inner_term = np.einsum("i,j->ij", alpha_, alpha_) - K_inv
-        # _ = np.einsum("ij,ijk->ijk", inner_term, dK_dTheta)
-        tr = np.trace(np.array([np.dot(inner_term, dK_dTheta[0, :, :]), np.dot(
-            inner_term, dK_dTheta[1, :, :]), np.dot(inner_term, dK_dTheta[2, :, :])]), axis1=1, axis2=2)
+        inner_term = np.einsum("ij,kjl->kil", inner_term, dK_dTheta)
 
-        # tr = np.trace(_)
-        return 0.5 * tr
+        return 0.5 * np.einsum("ijj", inner_term)
 
     def obj_func(params):
         lml = log_marginal_likelihood(params)
