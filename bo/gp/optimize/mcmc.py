@@ -54,13 +54,12 @@ def optimize(x_train, y_train, bounds, initial_params=np.ones(3), n_iter=1000):
                 K[x_idx, x_prime_idx] = kernel(x_train[x_idx], x_train[x_prime_idx],
                                                params[0], params[1], params[2], x_idx == x_prime_idx)
 
-        y = y_train
         yy = np.dot(np.linalg.inv(K), y_train)
-        return - (np.linalg.slogdet(K)[1] + np.dot(y, yy))
+        return - (np.linalg.slogdet(K)[1] + np.dot(y_train, yy))
 
     lml_prev = log_marginal_likelihood(params)
 
-    thetas_list = []
+    params_list = []
     lml_list = []
     for _ in range(n_iter):
         move = 1e-2 * np.random.normal(0, log_scale, size=len(params))
@@ -87,10 +86,10 @@ def optimize(x_train, y_train, bounds, initial_params=np.ones(3), n_iter=1000):
             params = next_params
             log_params = next_log_params
             lml_prev = lml_next
-            thetas_list.append(params)
+            params_list.append(params)
             lml_list.append(lml_prev)
 
-    return thetas_list[np.argmax(lml_list)]
+    return params_list[np.argmax(lml_list)]
 
 
 def gpr(x_train, y_train, x_test):
