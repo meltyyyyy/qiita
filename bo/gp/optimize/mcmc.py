@@ -4,8 +4,8 @@ import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import matplotlib.pyplot as plt
 import numpy as np
-from tqdm import tqdm
-from kernels import rbf, periodic, exp, linear
+from utils.train_test_split import train_test_split
+from utils.plot import plot_gpr
 plt.style.use('seaborn-pastel')
 
 
@@ -13,55 +13,17 @@ def objective(x):
     return 2 * np.sin(x) + 3 * np.cos(2 * x) + 5 * np.sin(2 / 3 * x)
 
 
-def train_test_split(x, y, test_size):
-    assert len(x) == len(y)
-    n_samples = len(x)
-    test_indices = np.sort(
-        np.random.choice(
-            np.arange(n_samples), int(
-                n_samples * test_size), replace=False))
-    train_indices = np.ones(n_samples, dtype=bool)
-    train_indices[test_indices] = False
-    test_indices = ~ train_indices
+def rbf(x, x_prime, theta_1, theta_2):
+    """RBF Kernel
 
-    return x[train_indices], x[test_indices], y[train_indices], y[test_indices]
+    Args:
+        x (float): data
+        x_prime (float): data
+        theta_1 (float): hyper parameter
+        theta_2 (float): hyper parameter
+    """
 
-
-n = 100
-data_x = np.linspace(0, 4 * np.pi, n)
-data_y = objective(data_x)
-
-
-x_train, x_test, y_train, y_test = train_test_split(
-    data_x, data_y, test_size=0.70)
-
-
-def plot_gpr(x_train, y_train, x_test, mu, var):
-    plt.figure(figsize=(16, 8))
-    plt.title('MCMC', fontsize=20)
-
-    plt.plot(data_x, data_y, label='objective')
-    plt.plot(
-        x_train,
-        y_train,
-        'o',
-        label='train data')
-
-    std = np.sqrt(np.abs(var))
-
-    plt.plot(x_test, mu, label='mean')
-
-    plt.fill_between(
-        x_test,
-        mu + 2 * std,
-        mu - 2 * std,
-        alpha=.2,
-        label='standard deviation')
-    plt.legend(
-        loc='lower left',
-        fontsize=12)
-
-    plt.savefig('gpr.png')
+    return theta_1 * np.exp(-1 * (x - x_prime)**2 / theta_2)
 
 
 # Radiant Basis Kernel + Error
@@ -168,5 +130,11 @@ def gpr(x_train, y_train, x_test):
 
 
 if __name__ == "__main__":
+    n = 100
+    data_x = np.linspace(0, 4 * np.pi, n)
+    data_y = objective(data_x)
+    x_train, x_test, y_train, y_test = train_test_split(
+        data_x, data_y, test_size=0.70)
+
     mu, var = gpr(x_train, y_train, x_test)
-    plot_gpr(x_train, y_train, x_test, mu, var)
+    plot_gpr(data_x, data_y, x_train, y_train, x_test, mu, var)
