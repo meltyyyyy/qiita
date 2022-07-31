@@ -7,6 +7,7 @@ import numpy as np
 import scipy.optimize
 from scipy.linalg import cholesky, cho_solve
 from utils.train_test_split import train_test_split
+from utils.plot import plot_gpr
 plt.style.use('seaborn-pastel')
 
 
@@ -25,43 +26,6 @@ def rbf(x, x_prime, theta_1, theta_2):
     """
 
     return theta_1 * np.exp(-1 * (x - x_prime)**2 / theta_2)
-
-
-n = 100
-data_x = np.linspace(0, 4 * np.pi, n)
-data_y = objective(data_x)
-
-
-x_train, x_test, y_train, y_test = train_test_split(
-    data_x, data_y, test_size=0.70)
-
-
-def plot_gpr(x_train, y_train, x_test, mu, var):
-    plt.figure(figsize=(16, 8))
-    plt.title('Gradient Decent', fontsize=20)
-
-    plt.plot(data_x, data_y, label='objective')
-    plt.plot(
-        x_train,
-        y_train,
-        'o',
-        label='train data')
-
-    std = np.sqrt(np.abs(var))
-
-    plt.plot(x_test, mu, label='mean')
-
-    plt.fill_between(
-        x_test,
-        mu + 2 * std,
-        mu - 2 * std,
-        alpha=.2,
-        label='standard deviation')
-    plt.legend(
-        loc='lower left',
-        fontsize=12)
-
-    plt.savefig('gpr.png')
 
 
 # Radiant Basis Kernel + Error
@@ -175,5 +139,11 @@ def gpr(x_train, y_train, x_test):
 
 
 if __name__ == "__main__":
+    n = 100
+    data_x = np.linspace(0, 4 * np.pi, n)
+    data_y = objective(data_x)
+    x_train, x_test, y_train, y_test = train_test_split(
+        data_x, data_y, test_size=0.70)
+
     mu, var = gpr(x_train, y_train, x_test)
-    plot_gpr(x_train, y_train, x_test, mu, var)
+    plot_gpr(data_x, data_y, x_train, y_train, x_test, mu, var)
