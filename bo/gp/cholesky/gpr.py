@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.optimize
 from scipy.linalg import cholesky, cho_solve
+from utils.train_test_split import train_test_split
 plt.style.use('seaborn-pastel')
 
 
@@ -23,20 +25,6 @@ def rbf(x, x_prime, theta_1, theta_2):
     """
 
     return theta_1 * np.exp(-1 * (x - x_prime)**2 / theta_2)
-
-
-def train_test_split(x, y, test_size):
-    assert len(x) == len(y)
-    n_samples = len(x)
-    test_indices = np.sort(
-        np.random.choice(
-            np.arange(n_samples), int(
-                n_samples * test_size), replace=False))
-    train_indices = np.ones(n_samples, dtype=bool)
-    train_indices[test_indices] = False
-    test_indices = ~ train_indices
-
-    return x[train_indices], x[test_indices], y[train_indices], y[test_indices]
 
 
 n = 100
