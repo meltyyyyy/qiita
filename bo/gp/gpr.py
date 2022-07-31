@@ -5,9 +5,10 @@ Gaussian Process is a stochastic process,
 such that every finite collection of those random variables has a multivariate normal distribution.
 """
 
-from kernels import rbf, periodic, exp, linear
 import numpy as np
 import matplotlib.pyplot as plt
+from utils.train_test_split import train_test_split
+from utils.plot import plot_gpr
 plt.style.use('seaborn-pastel')
 
 
@@ -15,55 +16,23 @@ def objective(x):
     return 2 * np.sin(x) + 3 * np.cos(2 * x) + 5 * np.sin(2 / 3 * x)
 
 
-def train_test_split(x, y, test_size):
-    assert len(x) == len(y)
-    n_samples = len(x)
-    test_indices = np.sort(
-        np.random.choice(
-            np.arange(n_samples), int(
-                n_samples * test_size), replace=False))
-    train_indices = np.ones(n_samples, dtype=bool)
-    train_indices[test_indices] = False
-    test_indices = ~ train_indices
+def rbf(x, x_prime, theta_1, theta_2):
+    """RBF Kernel
 
-    return x[train_indices], x[test_indices], y[train_indices], y[test_indices]
+    Args:
+        x (float): data
+        x_prime (float): data
+        theta_1 (float): hyper parameter
+        theta_2 (float): hyper parameter
+    """
 
-
-n = 100
-data_x = np.linspace(0, 4 * np.pi, n)
-data_y = objective(data_x)
+    return theta_1 * np.exp(-1 * (x - x_prime)**2 / theta_2)
 
 
-x_train, x_test, y_train, y_test = train_test_split(
-    data_x, data_y, test_size=0.70)
+# Radiant Basis Kernel
+def kernel(x, x_prime, theta_1=1.0, theta_2=1.0):
 
-
-def plot_gpr(x_train, y_train, x_test, mu, var):
-    plt.figure(figsize=(16, 8))
-    plt.title('Gaussian Process Regressor', fontsize=20)
-
-    plt.plot(data_x, data_y, label='objective')
-    plt.plot(
-        x_train,
-        y_train,
-        'o',
-        label='train data')
-
-    std = np.sqrt(np.abs(var))
-
-    plt.plot(x_test, mu, label='mean')
-
-    plt.fill_between(
-        x_test,
-        mu + 2 * std,
-        mu - 2 * std,
-        alpha=.2,
-        label='standard deviation')
-    plt.legend(
-        loc='lower left',
-        fontsize=12)
-
-    plt.savefig('gpr.png')
+    return rbf(x, x_prime, theta_1=theta_1, theta_2=theta_2)
 
 
 def gpr(x_train, y_train, x_test, kernel):
@@ -79,7 +48,7 @@ def gpr(x_train, y_train, x_test, kernel):
     for x_idx in range(train_length):
         for x_prime_idx in range(train_length):
             K[x_idx, x_prime_idx] = kernel(
-                x_train[x_idx], x_train[x_prime_idx], x_idx == x_prime_idx)
+                x_train[x_idx], x_train[x_prime_idx])
 
     yy = np.dot(np.linalg.inv(K), y_train)
 
@@ -88,12 +57,10 @@ def gpr(x_train, y_train, x_test, kernel):
         for x_idx in range(train_length):
             k[x_idx] = kernel(
                 x_train[x_idx],
-                x_test[x_test_idx],
-                x_idx == x_test_idx)
+                x_test[x_test_idx])
         s = kernel(
             x_test[x_test_idx],
-            x_test[x_test_idx],
-            x_test_idx == x_test_idx)
+            x_test[x_test_idx])
         mu.append(np.dot(k, yy))
         kK_ = np.dot(k, np.linalg.inv(K))
         var.append(s - np.dot(kK_, k.T))
@@ -101,24 +68,12 @@ def gpr(x_train, y_train, x_test, kernel):
 
 
 if __name__ == "__main__":
-    # # Radiant Basis Kernel
-    # def kernel(x, x_prime):
-    #     return rbf(x, x_prime, theta_1=0.1, theta_2=0.1)
-    # # Periodic Kernel
-    # kernel = lambda x, x_prime : periodic(x, x_prime, theta_1=1.0, theta_2=1.0)
-    # # Exponential Kernel
-    # kernel = lambda x, x_prime : exp(x, x_prime, theta=1.0)
-    # # Linear Kernel
-    # kernel = lambda x, x_prime : linear(x, x_prime, theta=1.0)
-    # Radiant Basis Kernel + Error
-    def kernel(x, x_prime, noise, theta_1=0.5, theta_2=0.5, theta_3=0.5):
-        # delta function
-        if noise:
-            delta = theta_3
-        else:
-            delta = 0
+    n = 100
+    data_x = np.linspace(0, 4 * np.pi, n)
+    data_y = objective(data_x)
 
-        return rbf(x, x_prime, theta_1=theta_1, theta_2=theta_2) + delta
+    x_train, x_test, y_train, y_test = train_test_split(
+        data_x, data_y, test_size=0.70)
 
     mu, var = gpr(x_train, y_train, x_test, kernel)
-    plot_gpr(x_train, y_train, x_test, mu, var)
+    plot_gpr(data_x, data_y, x_train, y_train, x_test, mu, var)
