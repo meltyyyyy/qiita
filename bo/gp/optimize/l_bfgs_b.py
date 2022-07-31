@@ -5,7 +5,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.optimize
-from kernels import rbf, periodic, exp, linear
+from utils.train_test_split import train_test_split
+from utils.plot import plot_gpr
 plt.style.use('seaborn-pastel')
 
 
@@ -13,55 +14,17 @@ def objective(x):
     return 2 * np.sin(x) + 3 * np.cos(2 * x) + 5 * np.sin(2 / 3 * x)
 
 
-def train_test_split(x, y, test_size):
-    assert len(x) == len(y)
-    n_samples = len(x)
-    test_indices = np.sort(
-        np.random.choice(
-            np.arange(n_samples), int(
-                n_samples * test_size), replace=False))
-    train_indices = np.ones(n_samples, dtype=bool)
-    train_indices[test_indices] = False
-    test_indices = ~ train_indices
+def rbf(x, x_prime, theta_1, theta_2):
+    """RBF Kernel
 
-    return x[train_indices], x[test_indices], y[train_indices], y[test_indices]
+    Args:
+        x (float): data
+        x_prime (float): data
+        theta_1 (float): hyper parameter
+        theta_2 (float): hyper parameter
+    """
 
-
-n = 100
-data_x = np.linspace(0, 4 * np.pi, n)
-data_y = objective(data_x)
-
-
-x_train, x_test, y_train, y_test = train_test_split(
-    data_x, data_y, test_size=0.70)
-
-
-def plot_gpr(x_train, y_train, x_test, mu, var):
-    plt.figure(figsize=(16, 8))
-    plt.title('Gradient Decent', fontsize=20)
-
-    plt.plot(data_x, data_y, label='objective')
-    plt.plot(
-        x_train,
-        y_train,
-        'o',
-        label='train data')
-
-    std = np.sqrt(np.abs(var))
-
-    plt.plot(x_test, mu, label='mean')
-
-    plt.fill_between(
-        x_test,
-        mu + 2 * std,
-        mu - 2 * std,
-        alpha=.2,
-        label='standard deviation')
-    plt.legend(
-        loc='lower left',
-        fontsize=12)
-
-    plt.savefig('gpr.png')
+    return theta_1 * np.exp(-1 * (x - x_prime)**2 / theta_2)
 
 
 # Radiant Basis Kernel + Error
@@ -72,15 +35,16 @@ def kernel(x, x_prime, theta_1, theta_2, theta_3, noise, eval_grad=False):
     else:
         delta = 0
 
+    k = rbf(x, x_prime, theta_1=theta_1, theta_2=theta_2) + delta
+
     if eval_grad:
         dk_dTheta_1 = kernel(x, x_prime, theta_1, theta_2, theta_3, noise) - delta
         dk_dTheta_2 = (kernel(x, x_prime, theta_1, theta_2, theta_3, noise) - delta) * ((x - x_prime)**2) / theta_2
         dk_dTheta_3 = delta
 
-        return rbf(x, x_prime, theta_1=theta_1, theta_2=theta_2) + \
-            delta, np.array([dk_dTheta_1, dk_dTheta_2, dk_dTheta_3])
+        return k, np.array([dk_dTheta_1, dk_dTheta_2, dk_dTheta_3])
 
-    return rbf(x, x_prime, theta_1=theta_1, theta_2=theta_2) + delta
+    return k
 
 
 def optimize(x_train, y_train, bounds, initial_params=np.ones(3)):
@@ -94,9 +58,8 @@ def optimize(x_train, y_train, bounds, initial_params=np.ones(3)):
                 K[x_idx, x_prime_idx] = kernel(
                     x_train[x_idx], x_train[x_prime_idx], params[0], params[1], params[2], x_idx == x_prime_idx)
 
-        y = y_train
-        yy = np.dot(np.linalg.inv(K), y)
-        return - (np.linalg.slogdet(K)[1] + np.dot(y, yy))
+        yy = np.dot(np.linalg.inv(K), y_train)
+        return - (np.linalg.slogdet(K)[1] + np.dot(y_train, yy))
 
     def log_likelihood_gradient(params):
         train_length = len(x_train)
@@ -111,14 +74,10 @@ def optimize(x_train, y_train, bounds, initial_params=np.ones(3)):
                 dK_dTheta[1, x_idx, x_prime_idx] = grad[1]
                 dK_dTheta[2, x_idx, x_prime_idx] = grad[2]
 
-        y = y_train
         K_inv = np.linalg.inv(K)
-        yy = np.dot(K_inv, y)
-
-        tr = np.trace(np.array([np.dot(K_inv, dK_dTheta[0, :, :]), np.dot(
-            K_inv, dK_dTheta[1, :, :]), np.dot(K_inv, dK_dTheta[2, :, :])]), axis1=1, axis2=2)
-        return -tr + np.array([np.dot(yy.T, np.dot(dK_dTheta[0, :, :], yy)), np.dot(yy.T,
-                              np.dot(dK_dTheta[1, :, :], yy)), np.dot(yy.T, np.dot(dK_dTheta[2, :, :], yy))])
+        yy = np.dot(K_inv, y_train)
+        tr = np.einsum("ijj", np.einsum("ij,kjl->kil", K_inv, dK_dTheta))
+        return - 0.5 * tr + 0.5 * np.einsum("i,ji->j", yy.T, np.einsum("ijk,k->ij", dK_dTheta, yy))
 
     def obj_func(params):
         lml = log_marginal_likelihood(params)
@@ -174,5 +133,11 @@ def gpr(x_train, y_train, x_test):
 
 
 if __name__ == "__main__":
+    n = 100
+    data_x = np.linspace(0, 4 * np.pi, n)
+    data_y = objective(data_x)
+    x_train, x_test, y_train, y_test = train_test_split(
+        data_x, data_y, test_size=0.70)
+
     mu, var = gpr(x_train, y_train, x_test)
-    plot_gpr(x_train, y_train, x_test, mu, var)
+    plot_gpr(data_x, data_y, x_train, y_train, x_test, mu, var)
