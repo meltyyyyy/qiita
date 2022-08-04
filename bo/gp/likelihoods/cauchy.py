@@ -5,7 +5,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
-from utils.train_test_split import train_test_split
 
 plt.style.use('seaborn-pastel')
 
@@ -14,9 +13,6 @@ def objective(x):
     return 2 * np.sin(x) + 3 * np.cos(2 * x) + 5 * np.sin(2 / 3 * x) + 5 * \
         np.random.binomial(1, 0.05, len(x))
 
-
-# def objective(x):
-#     return np.sin(x) + 5 * np.random.binomial(1, 0.05, len(x))
 
 
 def rbf(x, x_prime, theta_1, theta_2):
