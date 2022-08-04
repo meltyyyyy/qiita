@@ -10,6 +10,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+from elliptical import elliptical
 plt.style.use('seaborn-pastel')
 
 
@@ -96,9 +97,6 @@ def gpr(x, y, kernel, n_iter=100):
             f_posterior[:, i - burn_in] = f * y_std + y_mean
 
     return f_posterior
-
-
-
 
 
 if __name__ == "__main__":
