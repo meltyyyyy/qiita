@@ -56,7 +56,7 @@ def plot_gpr(x, y, x_train, f_posterior):
     plt.savefig('gpr.png')
 
 
-def gpr(x_train, y_train, x_test, kernel, n_iter=200):
+def gpr(x_train, y_train, x_test, kernel, n_iter=250):
     train_length = len(x_train)
     test_length = len(x_test)
 
@@ -71,10 +71,10 @@ def gpr(x_train, y_train, x_test, kernel, n_iter=200):
 
     def log_marginal_likelihood(y, f, gamma=1.0):
         cauchy = - np.sum(np.log(gamma + (y - f)**2 / gamma))
-        normal = - 0.5 * np.dot(f - y, np.dot(K_inv, f - y))
+        normal = - 0.5 * np.dot(f, np.dot(K_inv, f))
         return cauchy + normal
 
-    burn_in = 100
+    burn_in = 200
     n_samples = n_iter - burn_in
     assert n_iter > burn_in
 
@@ -90,7 +90,6 @@ def gpr(x_train, y_train, x_test, kernel, n_iter=200):
             except IOError:
                 sampling = True
                 # print('Slice sampling shrunk to the current position. Retry sampling ...')
-
 
         if i >= burn_in:
             f_posterior[:, i - burn_in] = f
