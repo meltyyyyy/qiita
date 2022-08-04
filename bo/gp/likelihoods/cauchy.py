@@ -4,6 +4,7 @@ import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import matplotlib.pyplot as plt
 import numpy as np
+from tqdm import tqdm
 from utils.train_test_split import train_test_split
 
 plt.style.use('seaborn-pastel')
@@ -55,7 +56,7 @@ def plot_gpr(x, y, x_train, f_posterior):
     plt.savefig('gpr.png')
 
 
-def gpr(x_train, y_train, x_test, kernel, n_iter=250):
+def gpr(x_train, y_train, x_test, kernel, n_iter=200):
     train_length = len(x_train)
     test_length = len(x_test)
 
@@ -73,15 +74,24 @@ def gpr(x_train, y_train, x_test, kernel, n_iter=250):
         normal = - 0.5 * np.dot(f - y, np.dot(K_inv, f - y))
         return cauchy + normal
 
-    burn_in = 200
+    burn_in = 100
     n_samples = n_iter - burn_in
     assert n_iter > burn_in
 
     f = np.dot(L_, np.random.randn(train_length))
     f_posterior = np.zeros((f.shape[0], n_samples))
-    for i in range(n_iter):
-        print(i)
-        f, _ = elliptical(f, lambda f: log_marginal_likelihood(y_train, f), L_)
+    for i in tqdm(range(n_iter)):
+
+        sampling = True
+        while sampling:
+            try:
+                f, _ = elliptical(f, lambda f: log_marginal_likelihood(y_train, f), L_)
+                sampling = False
+            except IOError:
+                sampling = True
+                # print('Slice sampling shrunk to the current position. Retry sampling ...')
+
+
         if i >= burn_in:
             f_posterior[:, i - burn_in] = f
 
