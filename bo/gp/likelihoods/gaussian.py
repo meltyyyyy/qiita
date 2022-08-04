@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
+"""Gaussian Process Regression
+This is Gaussian Process Regression implementation.
+Gaussian Process is a stochastic process,
+such that every finite collection of those random variables has a multivariate normal distribution.
+"""
 
 import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 from tqdm import tqdm
-
 plt.style.use('seaborn-pastel')
 
 
@@ -46,7 +50,7 @@ def plot_gpr(x, y, f_posterior):
 
     for i in range(f_posterior.shape[1]):
         plt.plot(x, f_posterior[:, i])
-    plt.savefig('cauchy.png')
+    plt.savefig('gaussian.png')
 
 
 def gpr(x, y, kernel, n_iter=100):
@@ -59,6 +63,7 @@ def gpr(x, y, kernel, n_iter=100):
                 x[x_idx], x[x_prime_idx], x_idx == x_prime_idx)
 
     K_inv = np.linalg.inv(K)
+    I_inv = np.linalg.inv(1e-6 * np.eye(len(y)))
     L_ = np.linalg.cholesky(K)
 
     # Normalization
@@ -66,10 +71,9 @@ def gpr(x, y, kernel, n_iter=100):
     y_std = np.std(y)
     y = (y - y_mean) / y_std
 
-    def log_marginal_likelihood(y, f, gamma=0.2):
-        cauchy = - np.sum(np.log(gamma + (y - f)**2 / gamma))
-        normal = - 0.5 * np.dot(f, np.dot(K_inv, f))
-        return cauchy + normal
+    def log_marginal_likelihood(y, f):
+        return - 0.5 * np.dot(y - f, np.dot(I_inv, y - f)) - \
+            0.5 * np.dot(f, np.dot(K_inv, f))
 
     burn_in = 50
     n_samples = n_iter - burn_in
@@ -94,36 +98,7 @@ def gpr(x, y, kernel, n_iter=100):
     return f_posterior
 
 
-def elliptical(f, log_likelihood, L):
-    """elipitical sampling
 
-    f is Gaussian Process
-    f ~ N(0, K)
-
-    Args:
-        f : target distribution
-        log_likelihood : log likelihood of f
-        L : triangle matrix of K
-
-    """
-    rho = log_likelihood(f) + np.log(np.random.uniform(0, 1))
-    nu = np.dot(L, np.random.randn(len(f)))
-
-    theta = np.random.uniform(0, 2 * np.pi)
-    st, ed = theta - 2 * np.pi, theta
-
-    while True:
-        f = f * np.cos(theta) + nu * np.sin(theta)
-        if log_likelihood(f) > rho:
-            return f, log_likelihood(f)
-        else:
-            if theta > 0:
-                ed = theta
-            elif theta < 0:
-                st = theta
-            else:
-                raise IOError('Slice sampling shrunk to the current position.')
-            theta = np.random.uniform(st, ed)
 
 
 if __name__ == "__main__":
@@ -132,28 +107,4 @@ if __name__ == "__main__":
     y = objective(x)
 
     f_posterior = gpr(x, y, kernel)
-
     plot_gpr(x, y, f_posterior)
-
-    # K_MM = np.zeros((test_length, test_length))
-    # for x_idx in range(test_length):
-    #     for x_prime_idx in range(test_length):
-    #         K_MM[x_idx, x_prime_idx] = kernel(
-    #             x_test[x_idx], x_test[x_prime_idx], x_idx == x_prime_idx)
-
-    # K_NM = np.zeros((train_length, test_length))
-    # for x_idx in range(train_length):
-    #     for x_prime_idx in range(test_length):
-    #         K_NM[x_idx, x_prime_idx] = kernel(
-    #             x_train[x_idx], x_test[x_prime_idx], noise=False)
-
-    # n_fs = 10
-    # f_samples = np.zeros((test_length, n_fs))
-    # for i in range(n_fs):
-    #     sample_idx = np.random.randint(n_samples)
-    #     f_n = f_posterior[:, sample_idx]
-    #     _ = np.einsum("ij,jk,k->i", K_NM.T, K_inv, f_n)
-    #     var = K_MM - np.einsum("ij,jk,kl->il", K_NM.T, K_inv, K_NM)
-    #     L_ = np.linalg.cholesky(var)
-    #     f_m = np.dot(L_, np.random.randn(test_length))
-    #     f_samples[:, i] = f_m
