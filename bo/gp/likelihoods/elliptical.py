@@ -4,9 +4,8 @@ import numpy as np
 np.random.seed(42)
 
 
-def elliptical(f, log_likelihood, nu):
-    assert len(f) == len(nu)
-
+def elliptical(f, log_likelihood, L):
+    nu = np.dot(L, np.random.randn(len(f)))
     rho = log_likelihood(f) + np.log(np.random.uniform(0, 1))
     theta = np.random.uniform(0, 2 * np.pi)
     st, ed = theta - 2 * np.pi, theta

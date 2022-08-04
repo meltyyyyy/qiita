@@ -8,12 +8,14 @@ from utils.train_test_split import train_test_split
 
 plt.style.use('seaborn-pastel')
 
-np.random.seed(42)
-
 
 def objective(x):
     return 2 * np.sin(x) + 3 * np.cos(2 * x) + 5 * np.sin(2 / 3 * x) + 5 * \
         np.random.binomial(1, 0.05, len(x))
+
+
+# def objective(x):
+#     return np.sin(x) + 5 * np.random.binomial(1, 0.05, len(x))
 
 
 def rbf(x, x_prime, theta_1, theta_2):
@@ -43,7 +45,7 @@ def kernel(x, x_prime, noise):
 def plot_gpr(x, y, x_train, f_posterior):
     plt.figure(figsize=(16, 8))
     plt.title('Cauchy', fontsize=20)
-    # plt.plot(x, y, 'o', label='objective')
+    plt.plot(x, y, 'x', label='objective')
 
     for i in range(f_posterior.shape[1]):
         plt.plot(x_train, f_posterior[:, i])
@@ -68,7 +70,7 @@ def gpr(x_train, y_train, x_test, kernel, n_iter=250):
 
     def log_marginal_likelihood(y, f, gamma=1.0):
         cauchy = - np.sum(np.log(gamma + (y - f)**2 / gamma))
-        normal = - np.dot(f, np.dot(K_inv, f)) / 2
+        normal = - 0.5 * np.dot(f - y, np.dot(K_inv, f - y))
         return cauchy + normal
 
     burn_in = 200
@@ -77,9 +79,9 @@ def gpr(x_train, y_train, x_test, kernel, n_iter=250):
 
     f = np.dot(L_, np.random.randn(train_length))
     f_posterior = np.zeros((f.shape[0], n_samples))
-    nu = f
     for i in range(n_iter):
-        f, _ = elliptical(f, lambda f: log_marginal_likelihood(y_train, f), nu)
+        print(i)
+        f, _ = elliptical(f, lambda f: log_marginal_likelihood(y_train, f), L_)
         if i >= burn_in:
             f_posterior[:, i - burn_in] = f
 
@@ -100,7 +102,7 @@ def gpr(x_train, y_train, x_test, kernel, n_iter=250):
     for i in range(n_fs):
         sample_idx = np.random.randint(n_samples)
         f_n = f_posterior[:, sample_idx]
-        mu = np.einsum("ij,jk,k->i", K_NM.T, K_inv, f_n)
+        _ = np.einsum("ij,jk,k->i", K_NM.T, K_inv, f_n)
         var = K_MM - np.einsum("ij,jk,kl->il", K_NM.T, K_inv, K_NM)
         L_ = np.linalg.cholesky(var)
         f_m = np.dot(L_, np.random.randn(test_length))
@@ -109,25 +111,36 @@ def gpr(x_train, y_train, x_test, kernel, n_iter=250):
     return f_posterior
 
 
-def elliptical(f, log_likelihood, nu):
-    assert len(f) == len(nu)
+def elliptical(f, log_likelihood, L):
+    """elipitical sampling
 
+    f is Gaussian Process
+    f ~ N(0, K)
+
+    Args:
+        f : target distribution
+        log_likelihood : log likelihood of f
+        L : triangle matrix of K
+
+    """
     rho = log_likelihood(f) + np.log(np.random.uniform(0, 1))
+    nu = np.dot(L, np.random.randn(len(f)))
+
     theta = np.random.uniform(0, 2 * np.pi)
-    # st, ed = theta - 2 * np.pi, theta
+    st, ed = theta - 2 * np.pi, theta
 
     while True:
         f = f * np.cos(theta) + nu * np.sin(theta)
-
         if log_likelihood(f) > rho:
             return f, log_likelihood(f)
         else:
-            # if theta > 0:
-            #     ed = theta
-            # else:
-            #     st = theta
-            theta = np.random.uniform(0, 2 * np.pi)
-            # theta = np.random.uniform(st, ed)
+            if theta > 0:
+                ed = theta
+            elif theta < 0:
+                st = theta
+            else:
+                raise IOError('Slice sampling shrunk to the current position.')
+            theta = np.random.uniform(st, ed)
 
 
 if __name__ == "__main__":
