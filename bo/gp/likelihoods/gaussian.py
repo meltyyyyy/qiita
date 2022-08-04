@@ -5,8 +5,6 @@ Gaussian Process is a stochastic process,
 such that every finite collection of those random variables has a multivariate normal distribution.
 """
 
-import os, sys
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
@@ -90,8 +88,8 @@ def gpr(x, y, kernel, n_iter=100):
                 f, _ = elliptical(f, lambda f: log_marginal_likelihood(y, f), L_)
                 sampling = False
             except IOError:
-                sampling = True
                 # print('Slice sampling shrunk to the current position. Retry sampling ...')
+                sampling = True
 
         if i >= burn_in:
             f_posterior[:, i - burn_in] = f * y_std + y_mean

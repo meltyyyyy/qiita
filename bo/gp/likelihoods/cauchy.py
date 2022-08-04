@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import os, sys
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
-
+from elliptical import elliptical
 plt.style.use('seaborn-pastel')
 
 
@@ -85,45 +83,13 @@ def gpr(x, y, kernel, n_iter=100):
                 f, _ = elliptical(f, lambda f: log_marginal_likelihood(y, f), L_)
                 sampling = False
             except IOError:
-                sampling = True
                 # print('Slice sampling shrunk to the current position. Retry sampling ...')
+                sampling = True
 
         if i >= burn_in:
             f_posterior[:, i - burn_in] = f * y_std + y_mean
 
     return f_posterior
-
-
-def elliptical(f, log_likelihood, L):
-    """elipitical sampling
-
-    f is Gaussian Process
-    f ~ N(0, K)
-
-    Args:
-        f : target distribution
-        log_likelihood : log likelihood of f
-        L : triangle matrix of K
-
-    """
-    rho = log_likelihood(f) + np.log(np.random.uniform(0, 1))
-    nu = np.dot(L, np.random.randn(len(f)))
-
-    theta = np.random.uniform(0, 2 * np.pi)
-    st, ed = theta - 2 * np.pi, theta
-
-    while True:
-        f = f * np.cos(theta) + nu * np.sin(theta)
-        if log_likelihood(f) > rho:
-            return f, log_likelihood(f)
-        else:
-            if theta > 0:
-                ed = theta
-            elif theta < 0:
-                st = theta
-            else:
-                raise IOError('Slice sampling shrunk to the current position.')
-            theta = np.random.uniform(st, ed)
 
 
 if __name__ == "__main__":
@@ -132,28 +98,4 @@ if __name__ == "__main__":
     y = objective(x)
 
     f_posterior = gpr(x, y, kernel)
-
     plot_gpr(x, y, f_posterior)
-
-    # K_MM = np.zeros((test_length, test_length))
-    # for x_idx in range(test_length):
-    #     for x_prime_idx in range(test_length):
-    #         K_MM[x_idx, x_prime_idx] = kernel(
-    #             x_test[x_idx], x_test[x_prime_idx], x_idx == x_prime_idx)
-
-    # K_NM = np.zeros((train_length, test_length))
-    # for x_idx in range(train_length):
-    #     for x_prime_idx in range(test_length):
-    #         K_NM[x_idx, x_prime_idx] = kernel(
-    #             x_train[x_idx], x_test[x_prime_idx], noise=False)
-
-    # n_fs = 10
-    # f_samples = np.zeros((test_length, n_fs))
-    # for i in range(n_fs):
-    #     sample_idx = np.random.randint(n_samples)
-    #     f_n = f_posterior[:, sample_idx]
-    #     _ = np.einsum("ij,jk,k->i", K_NM.T, K_inv, f_n)
-    #     var = K_MM - np.einsum("ij,jk,kl->il", K_NM.T, K_inv, K_NM)
-    #     L_ = np.linalg.cholesky(var)
-    #     f_m = np.dot(L_, np.random.randn(test_length))
-    #     f_samples[:, i] = f_m
