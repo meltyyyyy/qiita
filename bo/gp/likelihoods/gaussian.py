@@ -44,11 +44,12 @@ def kernel(x, x_prime, noise):
 
 def plot_gpr(x, y, f_posterior):
     plt.figure(figsize=(16, 8))
-    plt.title('Cauchy', fontsize=20)
+    plt.title('Gaussian Process Regression', fontsize=20)
     plt.plot(x, y, 'x', label='objective')
 
     for i in range(f_posterior.shape[1]):
         plt.plot(x, f_posterior[:, i])
+    plt.legend()
     plt.savefig('gaussian.png')
 
 
