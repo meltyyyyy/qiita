@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from scipy.stats import norm
 import numpy as np
 import matplotlib.pyplot as plt
 
-from gp.gpr import train_test_split, gpr
-from gp.kernels import rbf, periodic, exp, linear
+
 plt.style.use('seaborn-pastel')
 
 
