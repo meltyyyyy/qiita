@@ -5,7 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from scipy.stats import norm
 import numpy as np
 import matplotlib.pyplot as plt
-
+from train_test_split import train_test_split
 
 plt.style.use('seaborn-pastel')
 
@@ -39,31 +39,56 @@ def EI(mu, var):
                     sigma[i] * norm.pdf(theta[i]) for i in range(len(theta))])
 
 
+def rbf(x, x_prime, theta_1, theta_2):
+    """RBF Kernel
 
-n = 100
-data_x = np.linspace(0, 4 * np.pi, n)
-data_y = objective(data_x)
+    Args:
+        x (float): data
+        x_prime (float): data
+        theta_1 (float): hyper parameter
+        theta_2 (float): hyper parameter
+    """
+
+    return theta_1 * np.exp(-1 * (x - x_prime)**2 / theta_2)
 
 
-x_train, x_test, y_train, y_test = train_test_split(
-    data_x, data_y, test_size=0.90)
-
-
-# Radiant Basis Kernel
 def kernel(x, x_prime):
     return rbf(x, x_prime, theta_1=1.0, theta_2=1.0)
 
 
-mu, var = gpr(x_train, y_train, x_test, kernel)
+def gpr(x_train, y_train, x_test, kernel):
+    # average
+    mu = []
+    # variance
+    var = []
+
+    train_length = len(x_train)
+    test_length = len(x_test)
+
+    K = np.zeros((train_length, train_length))
+    for x_idx in range(train_length):
+        for x_prime_idx in range(train_length):
+            K[x_idx, x_prime_idx] = kernel(
+                x_train[x_idx], x_train[x_prime_idx])
+
+    yy = np.dot(np.linalg.inv(K), y_train)
+
+    for x_test_idx in range(test_length):
+        k = np.zeros((train_length,))
+        for x_idx in range(train_length):
+            k[x_idx] = kernel(
+                x_train[x_idx],
+                x_test[x_test_idx])
+        s = kernel(
+            x_test[x_test_idx],
+            x_test[x_test_idx])
+        mu.append(np.dot(k, yy))
+        kK_ = np.dot(k, np.linalg.inv(K))
+        var.append(s - np.dot(kK_, k.T))
+    return np.array(mu), np.array(var)
 
 
-# len(x_train) is 10
-ucb = UCB(mu, var, 10)
-# pi = PI(mu, var)
-# ei = EI(mu, var)
-
-
-def plot_aquisition(mu, var, acqui):
+def plot_aquisition(data_x, data_y, mu, var, acqui):
     plt.figure(figsize=(16, 8))
     plt.subplot(2, 1, 1)
     plt.title('Gaussian Process Regression', fontsize=20)
@@ -95,3 +120,20 @@ def plot_aquisition(mu, var, acqui):
         fontsize=12)
     plt.tight_layout()
     plt.savefig('acquisition.png')
+
+
+if __name__ == "__main__":
+    n = 100
+    data_x = np.linspace(0, 4 * np.pi, n)
+    data_y = objective(data_x)
+
+    x_train, x_test, y_train, y_test = train_test_split(data_x, data_y, test_size=0.90)
+
+    mu, var = gpr(x_train, y_train, x_test, kernel)
+
+    # len(x_train) is 10
+    ucb = UCB(mu, var, 10)
+    # pi = PI(mu, var)
+    # ei = EI(mu, var)
+
+    plot_aquisition(data_x, data_y, mu, var, ucb)
