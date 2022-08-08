@@ -8,7 +8,7 @@ plt.style.use('seaborn-pastel')
 
 
 def objective(x):
-    r = np.random.RandomState(42)
+    r = np.random.RandomState(2022)
     return 2 * np.sin(x) + 3 * np.cos(2 * x) + 5 * np.sin(2 / 3 * x) + 10 * \
         r.binomial(1, 0.05, len(x))
 
