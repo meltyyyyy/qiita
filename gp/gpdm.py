@@ -3,7 +3,6 @@
 
 import autograd.numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 from autograd import grad
 from sklearn.datasets import make_s_curve
 from scipy.optimize import fmin_l_bfgs_b
@@ -11,36 +10,64 @@ from sklearn.decomposition import PCA
 plt.style.use('seaborn-pastel')
 
 
-def gen_data():
-    T = 200
-    J = 40
-    X, t = make_s_curve(T)
-    X = np.delete(X, obj=1, axis=1)
-    X = X / np.std(X, axis=0)
-    D = X.shape[1]
-    inds = t.argsort()
-    X = X[inds]
-    t = t[inds]
-    K = rbf_kernel(X, 1, 1, 0)
+def make_dataset(n_samples=200, n_dims=40):
     r = np.random.RandomState(42)
-    F = r.multivariate_normal(np.zeros(T), K, size=J).T
+    X, t = make_s_curve(n_samples, random_state=42)
+
+    X = np.delete(X, obj=1, axis=1)
+
+    indices = t.argsort()
+    X, t = X[indices], t[indices]
+
+    K = np.zeros((n_samples, n_samples))
+    for x_idx in range(n_samples):
+        for x_prime_idx in range(n_samples):
+            K[x_idx, x_prime_idx] = rbf(X[x_idx], X[x_prime_idx], 1, 2)
+
+    F = r.multivariate_normal(np.zeros(n_samples), K, size=n_dims).T
     Y = F + r.normal(0, scale=1, size=F.shape)
     return X, Y, t
 
 
+def rbf(x, x_prime, theta_1, theta_2):
+    """RBF Kernel
+
+    Args:
+        x (float): data
+        x_prime (float): data
+        theta_1 (float): hyper parameter
+        theta_2 (float): hyper parameter
+    """
+
+    return theta_1 * np.exp(-1 * np.sum((x - x_prime)**2) / theta_2)
+
+
+# Radiant Basis Kernel + Error
+def kernel_Y(x, x_prime, theta_1, theta_2, theta_3, noise):
+    # delta function
+    if noise:
+        delta = theta_3
+    else:
+        delta = 0
+
+    return rbf(x, x_prime, theta_1=theta_1, theta_2=theta_2) + delta
+
+# def _kernel_Y(X, theta_1, theta_2, theta_3):
+
+
 def rbf_kernel(X, var, length_scale, diag):
-    T = len(X)
-    diffs = np.expand_dims(X / length_scale, 1) \
-        - np.expand_dims(X / length_scale, 0)
-    return var * np.exp(-0.5 * np.sum(diffs ** 2, axis=2)) + diag * np.eye(T)
+    N = X.shape[0]
+    diffs = np.expand_dims(X / length_scale, 1) - \
+        np.expand_dims(X / length_scale, 0)
+    return var * np.exp(-0.5 * np.sum(diffs ** 2, axis=2)) + diag * np.eye(N)
 
 
 def log_posterior(Y, X, beta, alpha):
-    _, J = Y.shape
+    _, n_dims = Y.shape
     D = X.shape[1]
 
     K_Y = rbf_kernel(X, *beta)
-    det_term = -J / 2 * np.prod(np.linalg.slogdet(K_Y))
+    det_term = -n_dims / 2 * np.prod(np.linalg.slogdet(K_Y))
     tr_term = -1 / 2 * np.trace(np.linalg.inv(K_Y) @ Y @ Y.T)
     LL = det_term + tr_term
 
@@ -84,7 +111,7 @@ def optimize_gpdm(Y, X0):
 
 
 if __name__ == "__main__":
-    X, Y, t = gen_data()
+    X, Y, t = make_dataset()
 
     # fig = plt.figure()
     # plt.scatter(X[:, 0], X[:, 1], c=t, cmap='Blues')
@@ -95,4 +122,3 @@ if __name__ == "__main__":
     fig = plt.figure()
     plt.scatter(X_map[:, 0], X_map[:, 1], c=t, cmap='Blues')
     fig.savefig("gpdm.png")
-
