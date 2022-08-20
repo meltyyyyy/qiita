@@ -80,9 +80,9 @@ def optimize(x_train, y_train, bounds, initial_params=np.ones(3)):
         return - 0.5 * tr + 0.5 * np.einsum("i,ji->j", yy.T, np.einsum("ijk,k->ij", dK_dTheta, yy))
 
     def obj_func(params):
-        lml = log_marginal_likelihood(params)
-        grad = log_likelihood_gradient(params)
-        return -lml, -grad
+        _lml = log_marginal_likelihood(params)
+        _grad = log_likelihood_gradient(params)
+        return -_lml, -_grad
 
     opt_res = scipy.optimize.minimize(
         obj_func,
