@@ -140,9 +140,13 @@ if __name__ == "__main__":
     # gplvm
     gplvm = GPLVM(Y, input_dim=2)
     gplvm.optimize()
-    
-    X_map = optimize_gpdm(Y, n_components=2)
+    X_map = gplvm.X
+    fig = plt.figure()
+    plt.scatter(X_map[:, 0], X_map[:, 1], c=t, cmap='Blues')
+    fig.savefig("gplvm.png")
 
+    # gpdm
+    X_map = optimize_gpdm(Y, n_components=2)
     fig = plt.figure()
     plt.scatter(X_map[:, 0], X_map[:, 1], c=t, cmap='Blues')
     fig.savefig("gpdm.png")
