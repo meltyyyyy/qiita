@@ -7,6 +7,7 @@ from autograd import grad
 from sklearn.datasets import make_s_curve
 from scipy.optimize import fmin_l_bfgs_b
 from sklearn.decomposition import PCA
+from GPy.models import GPLVM
 plt.style.use('seaborn-pastel')
 
 r = np.random.RandomState(42)
@@ -100,13 +101,13 @@ def log_posterior(Y, X, beta, alpha):
 def optimize_gpdm(Y, n_components):
     n_samples = Y.shape[0]
 
-    X0 = r.multivariate_normal(np.zeros(n_samples), np.eye(n_samples), size=n_components).T
-    X0 = X
+    pca = PCA(n_components=n_components)
+    X_init = pca.fit_transform(Y)
     beta0 = np.array([1, 1, 1e-6])
     alpha0 = np.array([1, 1, 1e-6, 1e-6])
 
     def _lml(params):
-        X = params[:n_samples * n_components].reshape(X0.shape)
+        X = params[:n_samples * n_components].reshape(X_init.shape)
         beta = params[n_samples * n_components:n_samples * n_components + 3]
         alpha = params[n_samples * n_components + 3:]
         return log_posterior(Y, X, beta, alpha)
@@ -115,19 +116,31 @@ def optimize_gpdm(Y, n_components):
         _grad = grad(_lml)
         return _lml(params), _grad(params)
 
-    x0 = np.concatenate([X0.flatten(), beta0, alpha0])
+    x0 = np.concatenate([X_init.flatten(), beta0, alpha0])
     opt_res = fmin_l_bfgs_b(obj_func, x0, epsilon=1e-32)
-    X_map = opt_res[0][:n_samples * n_components].reshape(X0.shape)
+    X_map = opt_res[0][:n_samples * n_components].reshape(X_init.shape)
     return X_map
 
 
 if __name__ == "__main__":
     X, Y, t = make_dataset(n_samples=200)
 
+    # original data
     fig = plt.figure()
     plt.scatter(X[:, 0], X[:, 1], c=t, cmap='Blues')
     fig.savefig("scurve.png")
 
+    # pca
+    pca = PCA(n_components=2)
+    X_map = pca.fit_transform(Y)
+    fig = plt.figure()
+    plt.scatter(X_map[:, 0], X_map[:, 1], c=t, cmap='Blues')
+    fig.savefig("pca.png")
+
+    # gplvm
+    gplvm = GPLVM(Y, input_dim=2)
+    gplvm.optimize()
+    
     X_map = optimize_gpdm(Y, n_components=2)
 
     fig = plt.figure()
