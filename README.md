@@ -32,6 +32,8 @@ Qiitaへ投稿した記事の中で用いたプログラムを置いているレ
 
 ### [ガウス過程力学モデルと主成分分析、ガウス過程潜在変数モデルを比較する](https://qiita.com/meltyyyyy/items/f2e9f81354d1ed72a5d1)
 
-**ガウス過程力学モデル(Gaussian Process Dynamical Model,以下GPDM)** はガウス過程による教師なし学習の一つで、 **ガウス過程潜在モデル(Gaussian Process Latent Variable Model,以下GPLVM)** を拡張したモデルのうちの一つです。
+**ガウス過程力学モデル(Gaussian Process Dynamical Model)** はガウス過程による教師なし学習の一つで、 **ガウス過程潜在モデル(Gaussian Process Latent Variable Model)** を拡張したモデルのうちの一つです。
 
 GPLVMでは、潜在変数 $\mathbf{X}=(\mathbf{x}_1,\mathbf{x}_2,\dots,\mathbf{x}_N)$ の独立性を仮定していました。これに対してGPDMは、潜在変数 $\mathbf{X}$ が時系列データであるという仮定を導入して、潜在空間での構造を学習します。
+
+GPDMの原論文を参考にしながら、GPDMをゼロから実装し、PCAやGPLVMなどの他の次元圧縮手法と比較を行いました。
