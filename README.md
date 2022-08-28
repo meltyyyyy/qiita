@@ -30,6 +30,10 @@ Qiitaへ投稿した記事の中で用いたプログラムを置いているレ
 
 ### [ガウス過程 from Scratch Non-Gaussianな尤度によるガウス過程](https://qiita.com/meltyyyyy/items/620691c0cd07023777cc)
 
+通常のガウス過程では、関数 $\mathbf{f}$ と出力 $\mathbf{y}$　の関係 $P(\mathbf{y}|\mathbf{f})$ がガウス分布 $\mathbb{N}(\mathbf{f},\sigma^2\mathbf{I})$ に従うという前提のもと、出力を計算していました。
+
+この記事では、尤度 $P(\mathbf{y}|\mathbf{f})$ がコーシー分布に従う場合を考え、データに予期しない外れ値が含まれていてもうまく回帰できるようなロバストなガウス過程を実装しました。
+
 ### [ガウス過程力学モデルと主成分分析、ガウス過程潜在変数モデルを比較する](https://qiita.com/meltyyyyy/items/f2e9f81354d1ed72a5d1)
 
 **ガウス過程力学モデル(Gaussian Process Dynamical Model)** はガウス過程による教師なし学習の一つで、 **ガウス過程潜在モデル(Gaussian Process Latent Variable Model)** を拡張したモデルのうちの一つです。
