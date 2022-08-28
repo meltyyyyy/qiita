@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+from turtle import title
 import autograd.numpy as np
 import matplotlib.pyplot as plt
 from autograd import grad
@@ -122,6 +123,23 @@ def optimize_gpdm(Y, n_components):
     return X_map
 
 
+def plot(X_map, title):
+    fig = plt.figure(figsize=(16, 8))
+    fig.suptitle(f"{title}", fontsize=18, fontweight='bold')
+
+    ax1 = fig.add_subplot(1, 2, 1)
+    ax1.set_title("Scatter", fontsize=18)
+    ax1.scatter(X_map[:, 0], X_map[:, 1], c=t, cmap='Blues')
+
+    ax2 = fig.add_subplot(1, 2, 2)
+    ax2.set_title("Line", fontsize=18)
+    ax2.plot(X_map[:, 0], X_map[:, 1])
+
+    fig.tight_layout()
+    fig.savefig("{}.png".format(title.lower()))
+    plt.close()
+
+
 if __name__ == "__main__":
     X, Y, t = make_dataset(n_samples=200)
 
@@ -133,20 +151,14 @@ if __name__ == "__main__":
     # pca
     pca = PCA(n_components=2)
     X_map = pca.fit_transform(Y)
-    fig = plt.figure()
-    plt.scatter(X_map[:, 0], X_map[:, 1], c=t, cmap='Blues')
-    fig.savefig("pca.png")
+    plot(X_map, title='PCA')
 
     # gplvm
     gplvm = GPLVM(Y, input_dim=2)
     gplvm.optimize()
     X_map = gplvm.X
-    fig = plt.figure()
-    plt.scatter(X_map[:, 0], X_map[:, 1], c=t, cmap='Blues')
-    fig.savefig("gplvm.png")
+    plot(X_map, title='GPLVM')
 
     # gpdm
     X_map = optimize_gpdm(Y, n_components=2)
-    fig = plt.figure()
-    plt.scatter(X_map[:, 0], X_map[:, 1], c=t, cmap='Blues')
-    fig.savefig("gpdm.png")
+    plot(X_map, title='GPDM')
