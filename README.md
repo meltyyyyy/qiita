@@ -36,20 +36,25 @@ Qiitaへ投稿した記事の中で用いたプログラムを置いているレ
 
 ### [ガウス過程 from Scratch コレスキー分解による高速化](https://qiita.com/meltyyyyy/items/44e2f270be72943086f3)
 
-特に何も工夫をしないままのガウス過程ではトータルの計算量として $O(N3)$ を必要としてしまいます。このままでは $N$ が小さいうちは大きな問題にはなりませんが、 $N$ が大きくなると手に途端に負えなくなってしまいます。
+特に何も工夫をしないままのガウス過程ではトータルの計算量として <img src="https://latex.codecogs.com/gif.latex?O(N^3)" /> を必要としてしまいます。このままではNが小さいうちは大きな問題にはなりませんが、Nが大きくなると手に途端に負えなくなってしまいます。
 
-この記事では **コレスキー分解(Cholesky decomposition)** を用いることでガウス過程の計算量を $O(N3)$ から $O(N2)$ まで削減していきます。
+この記事では **コレスキー分解(Cholesky decomposition)** を用いることでガウス過程の計算量を <img src="https://latex.codecogs.com/gif.latex?O(N^3)" /> から <img src="https://latex.codecogs.com/gif.latex?O(N^2)" /> まで削減していきます。
 
 ### [ガウス過程 from Scratch Non-Gaussianな尤度によるガウス過程](https://qiita.com/meltyyyyy/items/620691c0cd07023777cc)
 
-通常のガウス過程では、関数 $\mathbf{f}$ と出力 $\mathbf{y}$　の関係 $P(\mathbf{y}|\mathbf{f})$ がガウス分布 $\mathbb{N}(\mathbf{f},\sigma^2\mathbf{I})$ に従うという前提のもと、出力を計算していました。
+通常のガウス過程では、関数 <img src="https://latex.codecogs.com/gif.latex?\mathbf{f}" /> と出力 <img src="https://latex.codecogs.com/gif.latex?\mathbf{y}" /> の関係 <img src="https://latex.codecogs.com/gif.latex?P(\mathbf{y}|\mathbf{f})" /> がガウス分布 <img src="https://latex.codecogs.com/gif.latex?\mathbb{N}(\mathbf{f},\sigma^2\mathbf{I})" />　に従うという前提のもと、出力を計算していました。
 
-この記事では、尤度 $P(\mathbf{y}|\mathbf{f})$ がコーシー分布に従う場合を考え、データに予期しない外れ値が含まれていてもうまく回帰できるようなロバストなガウス過程を実装しました。
+この記事では、尤度 <img src="https://latex.codecogs.com/gif.latex?P(\mathbf{y}|\mathbf{f})" /> がコーシー分布に従う場合を考え、データに予期しない外れ値が含まれていてもうまく回帰できるようなロバストなガウス過程を実装しました。
+
+![image](https://user-images.githubusercontent.com/81362789/187079456-da19fb97-69d9-47c4-88fe-562fa995a1f0.png)
 
 ### [ガウス過程力学モデルと主成分分析、ガウス過程潜在変数モデルを比較する](https://qiita.com/meltyyyyy/items/f2e9f81354d1ed72a5d1)
 
 **ガウス過程力学モデル(Gaussian Process Dynamical Model)** はガウス過程による教師なし学習の一つで、 **ガウス過程潜在モデル(Gaussian Process Latent Variable Model)** を拡張したモデルのうちの一つです。
 
-GPLVMでは、潜在変数 $\mathbf{X}=(\mathbf{x}_1,\mathbf{x}_2,\dots,\mathbf{x}_N)$ の独立性を仮定していました。これに対してGPDMは、潜在変数 $\mathbf{X}$ が時系列データであるという仮定を導入して、潜在空間での構造を学習します。
+GPLVMでは、潜在変数 <img src="https://latex.codecogs.com/gif.latex?\mathbf{X}=(\mathbf{x}_1,\mathbf{x}_2,\dots,\mathbf{x}_N)" /> の独立性を仮定していました。これに対してGPDMは、潜在変数 <img src="https://latex.codecogs.com/gif.latex?\mathbf{X}" /> が時系列データであるという仮定を導入して、潜在空間での構造を学習します。
 
 GPDMの原論文を参考にしながら、GPDMをゼロから実装し、PCAやGPLVMなどの他の次元圧縮手法と比較を行いました。
+
+![image](https://user-images.githubusercontent.com/81362789/187079576-bb594b2b-81cd-4520-9be9-246965a733c5.png)
+
