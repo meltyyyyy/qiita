@@ -1,6 +1,9 @@
 # Qiita
 
-Qiitaへ投稿した記事の中で用いたプログラムを置いているレポジトリです。
+Qiitaへ投稿した記事の中で主に機械学習系の再現コードを置いているレポジトリです。
+
+
+
 
 ## [【MCMC】メトロポリス・ヘイスティングス法、ハミルトニアンモンテカルロ法、ギブスサンプリングを比較する](https://qiita.com/meltyyyyy/items/b04e5c13a0ea71c2be05)
 
@@ -14,7 +17,7 @@ Qiitaへ投稿した記事の中で用いたプログラムを置いているレ
 
 ![bo](https://user-images.githubusercontent.com/81362789/180634525-8dbcd42b-2896-44fe-85d1-451ab4984205.gif)
 
-## ガウス過程
+## ガウス過程シリーズ
 
 ### [ガウス過程 from Scratch](https://qiita.com/meltyyyyy/items/8440849532cd55da1e45)
 
