@@ -6,13 +6,7 @@ Qiitaへ投稿した記事の中で用いたプログラムを置いているレ
 
 **マルコフ連鎖モンテカルロ法(Markov chain Monte Carlo methods)** は、解析的に計算することが難しい事後分布からサンプリングしたいときに用いられる手法です。この記事ではMCMC法を用いたサンプリングアルゴリズム(M-H法、HMC法、ギブスサンプリング)を紹介しました。2次元ガウス分布を目標分布として、3つのアルゴリズムの振る舞いや性能を比較を行いました。
 
-<img src=https://user-images.githubusercontent.com/81362789/180633664-0b70caf5-cc49-4801-add1-552348506dec.png width=400>
-
-## [ベイズ最適化 from Scratch](https://qiita.com/meltyyyyy/items/e67f22f98a96e30e5461)
-
-非自明な関数の最大値、または最小値を求める手法は **Black-Box最適化** と呼ばれます。Black-Box最適化の中でもベイズの枠組みを用いて、関数の最大値、または最小値を求めていく方法を、 **ベイズ最適化(Bayesian Optimization)** と呼びます。この記事ではベイズ最適化を実行するプログラムをゼロから実装し、ベイズ最適化のアルゴリズムへの理解を深めました。
-
-![bo](https://user-images.githubusercontent.com/81362789/180634525-8dbcd42b-2896-44fe-85d1-451ab4984205.gif)
+<img src=https://user-images.githubusercontent.com/81362789/180633664-0b70caf5-cc49-4801-add1-552348506dec.png>
 
 ## [ベイズ最適化 from Scratch](https://qiita.com/meltyyyyy/items/e67f22f98a96e30e5461)
 
@@ -29,6 +23,8 @@ Qiitaへ投稿した記事の中で用いたプログラムを置いているレ
 ガウス過程は、ベイズ最適化や空間統計学の文脈でよく用いられます。また、最近になって深層学習が発展するにつれて、ニューラルネットワークとガウス過程の等価性が示され(Lee et al, 2018)、注目を集めるようにもなりました。具体的には、隠れ層が１層のニューラルネットワークで隠れ層のユニット数を∞にすると、中心極限定理によりニューラルネットワークの出力はガウス過程と等価になります。
 
 この記事では、ガウス過程の導出とプログラムのスクラッチ実装を行いました。
+
+![image](https://user-images.githubusercontent.com/81362789/187078942-8b84644e-7293-4ed6-aa83-9d7e17b4c5d8.png)
 
 ### [ガウス過程 from Scratch MCMCと勾配法によるハイパーパラメータ最適化](https://qiita.com/meltyyyyy/items/5a058ecc81e010876a39)
 
