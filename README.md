@@ -28,6 +28,10 @@ Qiitaへ投稿した記事の中で用いたプログラムを置いているレ
 
 ### [ガウス過程 from Scratch コレスキー分解による高速化](https://qiita.com/meltyyyyy/items/44e2f270be72943086f3)
 
+特に何も工夫をしないままのガウス過程ではトータルの計算量として $O(N3)$ を必要としてしまいます。このままでは $N$ が小さいうちは大きな問題にはなりませんが、 $N$ が大きくなると手に途端に負えなくなってしまいます。
+
+この記事では **コレスキー分解(Cholesky decomposition)** を用いることでガウス過程の計算量を $O(N3)$ から $O(N2)$ まで削減していきます。
+
 ### [ガウス過程 from Scratch Non-Gaussianな尤度によるガウス過程](https://qiita.com/meltyyyyy/items/620691c0cd07023777cc)
 
 通常のガウス過程では、関数 $\mathbf{f}$ と出力 $\mathbf{y}$　の関係 $P(\mathbf{y}|\mathbf{f})$ がガウス分布 $\mathbb{N}(\mathbf{f},\sigma^2\mathbf{I})$ に従うという前提のもと、出力を計算していました。
