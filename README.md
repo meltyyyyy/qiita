@@ -54,7 +54,14 @@ Qiitaへ投稿した記事の中で用いたプログラムを置いているレ
 
 GPLVMでは、潜在変数 <img src="https://latex.codecogs.com/gif.latex?\mathbf{X}=(\mathbf{x}_1,\mathbf{x}_2,\dots,\mathbf{x}_N)" /> の独立性を仮定していました。これに対してGPDMは、潜在変数 <img src="https://latex.codecogs.com/gif.latex?\mathbf{X}" /> が時系列データであるという仮定を導入して、潜在空間での構造を学習します。
 
-GPDMの原論文を参考にしながら、GPDMをゼロから実装し、PCAやGPLVMなどの他の次元圧縮手法と比較を行いました。
+この記事では、GPDMの原論文を参考にしながら、GPDMをゼロから実装し、PCAやGPLVMなどの他の次元圧縮手法と比較を行いました。
 
 ![image](https://user-images.githubusercontent.com/81362789/187079576-bb594b2b-81cd-4520-9be9-246965a733c5.png)
 
+## [シミュレーテッド・アニーリング from Scratch](https://qiita.com/meltyyyyy/items/096efb08fb4ec532c330)
+
+**シミュレーテッド・アニーリング(Simulated Annealing)** は、「焼きなまし法」とも呼ばれ、大域的最適化問題へのアプローチ方法の一つです。「焼きなまし」の名称から察せられる通り、金属を高温の状態にして、徐々に温度を下げることで秩序がある構造を作り出す焼きなましの技術をコンピュータ上で再現したアルゴリズムになります。
+
+この記事では、シミュレーテッド・アニーリングのスクラッチ実装を行いました。
+
+![image](https://user-images.githubusercontent.com/81362789/187080038-86ff2aaf-4df0-4549-be4e-d8cd3447b12c.png)
