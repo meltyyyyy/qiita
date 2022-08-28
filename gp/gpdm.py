@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-from turtle import title
 import autograd.numpy as np
 import matplotlib.pyplot as plt
 from autograd import grad
@@ -29,6 +28,17 @@ def make_dataset(n_samples=200, n_dims=40):
     return X, Y, t
 
 
+def kernel(X, theta_1, theta_2):
+    length = X.shape[0]
+
+    K = np.zeros((length, length))
+    for x_idx in range(length):
+        for x_prime_idx in range(length):
+            K[x_idx, x_prime_idx] += rbf(X[x_idx], X[x_prime_idx], theta_1, theta_2)
+
+    return K
+
+
 def rbf(x, x_prime, theta_1, theta_2):
     """RBF Kernel
 
@@ -42,18 +52,7 @@ def rbf(x, x_prime, theta_1, theta_2):
     return theta_1 * np.exp(-1 * np.sum((x - x_prime)**2) / theta_2)
 
 
-def kernel(X, theta_1, theta_2):
-    length = X.shape[0]
-
-    K = np.zeros((length, length))
-    for x_idx in range(length):
-        for x_prime_idx in range(length):
-            K[x_idx, x_prime_idx] += rbf(X[x_idx], X[x_prime_idx], theta_1, theta_2)
-
-    return K
-
-
-# Radiant Basis Kernel + Error
+# # Radiant Basis Kernel + Error
 # def kernel_Y(X, theta_1, theta_2, theta_3):
 #     length = X.shape[0]
 
