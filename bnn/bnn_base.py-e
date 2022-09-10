@@ -70,28 +70,36 @@ class Model(PyroModule):
             obs = pyro.sample("Y", dist.Normal(mu, sigma).to_event(1), obs=Y)
         return mu
 
-
+# インスタンス化
 model = Model(h1=h1, h2=h2)
 
+# パラメータをリセット
 pyro.clear_param_store()
+# 近似分布の設定
 guide = AutoDiagonalNormal(model)
+# optimizerの設定
 adam = pyro.optim.Adam({"lr": 0.03})
+# SVIクラスのインスタンス化
 svi = SVI(model, guide, adam, loss=Trace_ELBO())
 
+# データをtensorに変換
 x_data = torch.from_numpy(x_data).float().unsqueeze(-1)
 y_data = torch.from_numpy(y_data).float().unsqueeze(-1)
 
+# 最適化
 torch.manual_seed(0)
 n_epoch = 10000
 loss_list = []
 for epoch in range(n_epoch):
 
+    # 変分推論の最適化ステップ
     loss = svi.step(x_data, y_data, h1, h2)
     loss_list.append(loss)
 
+# 損失関数の可視化
 plt.plot(np.array(loss_list))
 plt.xlabel('step')
 plt.ylabel('Loss')
-plt.tight_layout()
+plt.tight_layout();
 plt.savefig('learning_curve.png')
 plt.close()
