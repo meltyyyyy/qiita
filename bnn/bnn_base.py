@@ -95,3 +95,24 @@ plt.ylabel('Loss')
 plt.tight_layout()
 plt.savefig('learning_curve.png')
 plt.close()
+
+predictive = Predictive(model, guide=guide, num_samples=500)
+
+x_new = torch.linspace(-2.0, 2.0, 1000).unsqueeze(-1)
+y_pred_samples = predictive(x_new, None, h1, h2)['Y']
+y_pred_mean = y_pred_samples.mean(axis=0)
+percentiles = np.percentile(y_pred_samples.squeeze(-1), [5.0, 95.0], axis=0)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(x_data, y_data, 'o', markersize=3, label='data')
+ax.plot(x_linspace, y_linspace, label='true_func')
+ax.plot(x_new, y_pred_mean, label='mean')
+ax.fill_between(x_new.squeeze(-1), percentiles[0, :], percentiles[1, :],
+                alpha=0.5, label='90percentile', color='orange')
+
+ax.set_xlabel(r'$x$')
+ax.set_ylabel(r'$x$')
+ax.set_ylabel(r'$y$')
+ax.set_ylim(-13, 13)
+ax.legend()
+plt.savefig('posterior.png')
