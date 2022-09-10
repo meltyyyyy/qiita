@@ -1,0 +1,77 @@
+from pyro.infer import SVI, Trace_ELBO, Predictive
+from pyro.infer.autoguide import AutoDiagonalNormal
+from pyro.nn import PyroModule, PyroSample, DenseNN
+import pyro.distributions as dist
+import pyro
+import torch.nn.functional as F
+import torch.nn as nn
+import torch
+import numpy as np
+import matplotlib.pyplot as plt
+plt.style.use('seaborn-pastel')
+
+N = 30
+
+
+def make_data(x, eps):
+    y = 10 * np.sin(3 * x) * np.exp(- x ** 2)
+    noise = np.random.normal(0, eps, size=x.shape[0])
+    return y + noise
+
+
+x_data = np.random.uniform(low=-2, high=2, size=N)
+y_data = make_data(x_data, 2)
+
+
+x_linspace = np.linspace(-2, 2, 1000)
+y_linspace = make_data(x_linspace, 0.0)
+
+
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.plot(x_data, y_data, 'o', markersize=2, label='data')
+ax.plot(x_linspace, y_linspace, label='true_func')
+ax.set_xlabel('$x$')
+ax.set_ylabel('$y$')
+ax.legend()
+plt.tight_layout()
+plt.savefig('data.png')
+plt.close()
+
+
+# モデリング方法1
+# 隠れ層の次元
+h1, h2 = 10, 10
+
+class Model(PyroModule):
+    # 各コンポーネントを定義
+    def __init__(self, h1=h1, h2=h2):
+        super().__init__()
+        # 第1層（確率変数のbatchshapeをeventshapeにする）
+        self.fc1 = PyroModule[nn.Linear](1, h1)
+        self.fc1.weight = PyroSample(dist.Normal(0.,10.).expand([h1, 1]).to_event(2))
+        self.fc1.bias = PyroSample(dist.Normal(0.,10.).expand([h1]).to_event(1))
+        # 第2層
+        self.fc2 = PyroModule[nn.Linear](h1, h2)
+        self.fc2.weight = PyroSample(dist.Normal(0.,10.).expand([h2, h1]).to_event(2))
+        self.fc2.bias = PyroSample(dist.Normal(0.,10.).expand([h2]).to_event(1))
+        # 出力層
+        self.fc3 = PyroModule[nn.Linear](h2, 1)
+        self.fc3.weight = PyroSample(dist.Normal(0.,10.).expand([1, h2]).to_event(2))
+        self.fc3.bias = PyroSample(dist.Normal(0.,10.).expand([1]).to_event(1))
+        self.relu = nn.ReLU()
+
+    # データの生成過程を記述
+    def forward(self, X, Y=None, h1=h1, h2=h2):
+        # ニューラルネットワークの出力
+        X = self.relu(self.fc1(X))
+        X = self.relu(self.fc2(X))
+        mu = self.fc3(X)
+        # 観測ノイズの標準偏差をサンプリング
+        sigma = pyro.sample("sigma", dist.Uniform(0.,2.0))
+        # 尤度の積
+        with pyro.plate("data", X.shape[0]):
+          # shapeが(N, 1)であるため, 右の1をeventshapeにする
+          obs = pyro.sample("Y", dist.Normal(mu, sigma).to_event(1), obs=Y)
+        # 全ての軸をevent_shapeにしても計算はできる
+        #obs = pyro.sample("Y", dist.Normal(mu, sigma).to_event(2), obs=Y)
+        return mu
