@@ -25,5 +25,6 @@ def main():
     fig.savefig('horseshoe.png')
     plt.close()
 
+
 if __name__ == "__main__":
     main()

@@ -66,3 +66,11 @@ GPLVMでは、潜在変数 <img src="https://latex.codecogs.com/gif.latex?\mathb
 この記事では、シミュレーテッド・アニーリングのスクラッチ実装を行いました。
 
 ![image](https://user-images.githubusercontent.com/81362789/187080038-86ff2aaf-4df0-4549-be4e-d8cd3447b12c.png)
+
+## [馬蹄分布(Horseshoe Distribution)の基本](https://qiita.com/meltyyyyy/items/91a95a777c6c6e6c7e5a)
+
+馬蹄分布は確率変数がスパースであるという事前知識があるときに用いられる分布になっています。
+
+馬蹄分布そのものは平均0のある分散の値を持った正規分布から生成されるものですが、縮小係数は τ=1 のときにBeta分布から生成され、その形が馬の蹄に似ていることから馬蹄分布という名前がつきました。
+
+この記事では馬蹄分布の基本的な事柄について解説を行いました。
