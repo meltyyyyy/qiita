@@ -14,19 +14,16 @@ def horseshoe():
 
 def main():
     beta = np.random.beta(0.5, 0.5, size=100000)
-    fig = plt.figure()
-    plt.title("Beta(0.5, 0.5)")
-    plt.hist(beta, bins=100)
-    fig.savefig("dist-k.png")
-    plt.close()
-
     samples = horseshoe()
-    fig = plt.figure()
-    plt.title("Horseshoe ditribution")
-    plt.hist(samples, bins=100)
-    fig.savefig("horseshoe.png")
-    plt.close()
 
+    fig, axes = plt.subplots(1, 2, figsize=(16, 8))
+    axes[0].set_title('Beta(0.5,0.5)')
+    axes[0].hist(beta, bins=100)
+    axes[1].set_title('Horseshoe Distribution')
+    axes[1].hist(samples, bins=100)
+    fig.tight_layout()
+    fig.savefig('horseshoe.png')
+    plt.close()
 
 if __name__ == "__main__":
     main()
