@@ -74,3 +74,6 @@ GPLVMでは、潜在変数 <img src="https://latex.codecogs.com/gif.latex?\mathb
 馬蹄分布そのものは平均0のある分散の値を持った正規分布から生成されるものですが、縮小係数は τ=1 のときにBeta分布から生成され、その形が馬の蹄に似ていることから馬蹄分布という名前がつきました。
 
 この記事では馬蹄分布の基本的な事柄について解説を行いました。
+
+![horseshoe](https://user-images.githubusercontent.com/81362789/190842274-ebffbcd9-114b-4152-8efa-141ecfc04aa1.png)
+
