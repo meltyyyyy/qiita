@@ -84,3 +84,6 @@ GPLVMでは、潜在変数 <img src="https://latex.codecogs.com/gif.latex?\mathb
 正規分布などを事前分布に用いたベイズ線形回帰と比べて、馬蹄分布を事前分布に用いたベイズ線形回帰では、事後分布からのサンプリングには比較的複雑なコードが必要になります。
 
 この記事では、 **マルコフ連鎖モンテカルロ法(Markov chain Monte Calro method)** のアルゴリズムの一つである **ギブスサンプリング(Gibbs Sampling)** を用いた、最も基本的な馬蹄事後分布からのサンプリング方法を解説しました。
+
+![bhs-tp](https://user-images.githubusercontent.com/81362789/190858012-b4fc8f44-046a-42e4-a315-b7a4d91ee0eb.png)
+
