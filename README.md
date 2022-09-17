@@ -65,7 +65,7 @@ GPLVMでは、潜在変数 <img src="https://latex.codecogs.com/gif.latex?\mathb
 
 この記事では、シミュレーテッド・アニーリングのスクラッチ実装を行いました。
 
-![image](https://user-images.githubusercontent.com/81362789/187080038-86ff2aaf-4df0-4549-be4e-d8cd3447b12c.png)
+![sa](https://user-images.githubusercontent.com/81362789/190842392-4b88cd7f-edd4-4941-808a-7d292c4359fc.gif)
 
 ## [馬蹄分布(Horseshoe Distribution)の基本](https://qiita.com/meltyyyyy/items/91a95a777c6c6e6c7e5a)
 
