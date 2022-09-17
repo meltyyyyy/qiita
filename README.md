@@ -79,8 +79,8 @@ GPLVMでは、潜在変数 <img src="https://latex.codecogs.com/gif.latex?\mathb
 
 ## [スパース性を導入したベイズ線形回帰](https://qiita.com/meltyyyyy/items/cb93056a91831c7a8eef)
 
-線形回帰の解がスパースである(0が多い)ことが事前にわかっているとき、 ベイズ線形回帰(Bayesian Linear Regression) において重みの事前分布に対して、 馬蹄分布(Horseshoe Distribution) を用いるのが一般的です。
+線形回帰の解がスパースである(0が多い)ことが事前にわかっているとき、 **ベイズ線形回帰(Bayesian Linear Regression)** において重みの事前分布に対して、 **馬蹄分布(Horseshoe Distribution)** を用いるのが一般的です。
 
 正規分布などを事前分布に用いたベイズ線形回帰と比べて、馬蹄分布を事前分布に用いたベイズ線形回帰では、事後分布からのサンプリングには比較的複雑なコードが必要になります。
 
-この記事では、 マルコフ連鎖モンテカルロ法(Markov chain Monte Calro method) のアルゴリズムの一つである　ギブスサンプリング(Gibbs Sampling) を用いた、最も基本的な馬蹄事後分布からのサンプリング方法を解説しました。
+この記事では、 **マルコフ連鎖モンテカルロ法(Markov chain Monte Calro method)** のアルゴリズムの一つである **ギブスサンプリング(Gibbs Sampling)** を用いた、最も基本的な馬蹄事後分布からのサンプリング方法を解説しました。
