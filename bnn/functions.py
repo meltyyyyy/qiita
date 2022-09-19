@@ -1,12 +1,11 @@
 import numpy as np
-from core import Function, Variable, as_variable, as_array
+from core import Function, as_variable
+import utils
 
 
 # =============================================================================
 # Basic functions: tanh / exp / log
 # =============================================================================
-
-
 class Tanh(Function):
     def forward(self, x):
         y = np.tanh(x)
@@ -190,8 +189,7 @@ class BroadcastTo(Function):
 
     def forward(self, x):
         self.x_shape = x.shape
-        xp = dezero.cuda.get_array_module(x)
-        y = xp.broadcast_to(x, self.shape)
+        y = np.broadcast_to(x, self.shape)
         return y
 
     def backward(self, gy):
@@ -249,26 +247,9 @@ def linear(x, W, b=None):
     return Linear()(x, W, b)
 
 
-def linear_simple(x, W, b=None):
-    t = matmul(x, W)
-    if b is None:
-        return t
-
-    y = t + b
-    t.data = None  # Release t.data (ndarray) for memory efficiency
-    return y
-
-
 # =============================================================================
-# loss function: mean_squared_error / softmax_cross_entropy / sigmoid_cross_entropy / binary_cross_entropy
+# loss function: mean_squared_error
 # =============================================================================
-def mean_squared_error_simple(x0, x1):
-    x0, x1 = as_variable(x0), as_variable(x1)
-    diff = x0 - x1
-    y = sum(diff ** 2) / len(diff)
-    return y
-
-
 class MeanSquaredError(Function):
     def forward(self, x0, x1):
         diff = x0 - x1
@@ -285,9 +266,6 @@ class MeanSquaredError(Function):
 
 def mean_squared_error(x0, x1):
     return MeanSquaredError()(x0, x1)
-
-
-
 
 
 # =============================================================================
@@ -334,8 +312,7 @@ class Clip(Function):
         self.x_max = x_max
 
     def forward(self, x):
-        xp = cuda.get_array_module(x)
-        y = xp.clip(x, self.x_min, self.x_max)
+        y = np.clip(x, self.x_min, self.x_max)
         return y
 
     def backward(self, gy):
