@@ -82,7 +82,7 @@ x_data = torch.from_numpy(x_data).float().unsqueeze(-1)
 y_data = torch.from_numpy(y_data).float().unsqueeze(-1)
 
 torch.manual_seed(0)
-n_epoch = 10000
+n_epoch = 500
 loss_list = []
 for epoch in range(n_epoch):
 
