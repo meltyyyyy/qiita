@@ -1,4 +1,3 @@
-import os
 import weakref
 import numpy as np
 import functions as F

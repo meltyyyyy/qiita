@@ -12,6 +12,7 @@ def bhs(X, y, n_samples=1000, burnin=200):
     XtX = X.T @ X
 
     beta = np.zeros((p, n_samples))
+    beta0 = np.mean(y)
     sigma2 = 1
     lambda2 = np.random.uniform(size=p)
     tau2 = 1
@@ -51,7 +52,7 @@ def bhs(X, y, n_samples=1000, burnin=200):
         if i >= burnin:
             beta[:, i - burnin] = b
 
-    return beta
+    return beta, beta0
 
 
 if __name__ == '__main__':
@@ -59,15 +60,16 @@ if __name__ == '__main__':
     p = 20
 
     # true coefficients
+    coef0 = 2.0
     coefs = np.zeros((p,))
     coefs[0] = 1.0
     coefs[1] = 1.5
     coefs[2] = 0.5
 
     X = np.random.multivariate_normal(np.zeros((p,)), np.eye(p), size=n)
-    y = X @ coefs
+    y = coef0 + X @ coefs
 
-    beta = bhs(X, y)
+    beta, beta0 = bhs(X, y)
 
     # traceplot
     fig, axes = plt.subplots(3, 3, figsize=(24, 24))

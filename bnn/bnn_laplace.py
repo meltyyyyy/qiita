@@ -1,77 +1,28 @@
 import numpy as np
+from core import Model
+import layers as L
+import functions as F
 
 
-# =============================================================================
-# Layer (base class)
-# =============================================================================
-class Layer:
-    def __init__(self):
-        self._params = set()
+class BNN(Model):
+    def __init__(self, sigma_w, sigma_y):
+        super().__init__()
+        self.sigma_w = sigma_w
+        self.sigma_y = sigma_y
 
-    def __setattr__(self, name, value):
-        if isinstance(value, (Parameter, Layer)):
-            self._params.add(name)
-        super().__setattr__(name, value)
+        self.fc1 = L.Linear(in_size=1, out_size=1 * 32)
+        self.fc1.W = np.random.normal(0, sigma_w ** 2, size=32).reshape(1, 32)
+        self.fc1.b = np.random.normal(0, sigma_w ** 2, size=32)
+        self.fc2 = L.Linear(in_size=32, out_size=32)
+        self.fc2.W = np.random.normal(0, sigma_w ** 2, size=32 * 32).reshape(32, 32)
+        self.fc2.b = np.random.normal(0, sigma_w ** 2, size=32 * 32)
+        self.fc3 = L.Linear(in_size=32, out_size=1)
+        self.fc3.W = np.random.normal(0, sigma_w ** 2, size=32 * 1).reshape(32, 1)
+        self.fc3.b = np.random.normal(0, sigma_w ** 2, size=32 * 1).reshape(32, 1)
+        self.tanh = F.tanh
 
-    def __call__(self, *inputs):
-        outputs = self.forward(*inputs)
-        if not isinstance(outputs, tuple):
-            outputs = (outputs,)
-        self.inputs = [weakref.ref(x) for x in inputs]
-        self.outputs = [weakref.ref(y) for y in outputs]
-        return outputs if len(outputs) > 1 else outputs[0]
-
-    def forward(self, inputs):
-        raise NotImplementedError()
-
-    def params(self):
-        for name in self._params:
-            obj = self.__dict__[name]
-
-            if isinstance(obj, Layer):
-                yield from obj.params()
-            else:
-                yield obj
-
-    def cleargrads(self):
-        for param in self.params():
-            param.cleargrad()
-
-    def to_cpu(self):
-        for param in self.params():
-            param.to_cpu()
-
-    def to_gpu(self):
-        for param in self.params():
-            param.to_gpu()
-
-    def _flatten_params(self, params_dict, parent_key=""):
-        for name in self._params:
-            obj = self.__dict__[name]
-            key = parent_key + '/' + name if parent_key else name
-
-            if isinstance(obj, Layer):
-                obj._flatten_params(params_dict, key)
-            else:
-                params_dict[key] = obj
-
-    def save_weights(self, path):
-        self.to_cpu()
-
-        params_dict = {}
-        self._flatten_params(params_dict)
-        array_dict = {key: param.data for key, param in params_dict.items()
-                      if param is not None}
-        try:
-            np.savez_compressed(path, **array_dict)
-        except (Exception, KeyboardInterrupt) as e:
-            if os.path.exists(path):
-                os.remove(path)
-            raise
-
-    def load_weights(self, path):
-        npz = np.load(path)
-        params_dict = {}
-        self._flatten_params(params_dict)
-        for key, param in params_dict.items():
-            param.data = npz[key]
+    def forward(self, X, Y=None):
+        X = self.tanh(self.fc1(X))
+        X = self.tanh(self.fc2(X))
+        mu = self.fc3(X)
+        return mu + np.random.normal(0, self.sigma_y)
