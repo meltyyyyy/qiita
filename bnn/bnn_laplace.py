@@ -23,6 +23,10 @@ class Linear:
         self.db = np.sum(dy, axis=0)
         return dx
 
+    def update(self, learning_rate=0.01):
+        self.W -= learning_rate * self.dW
+        self.b -= learning_rate * self.db
+
 
 class Tanh:
     def __init__(self):
@@ -88,6 +92,11 @@ class MLP:
         dx = self.fc1.backward(dx)
 
         return dx
+
+    def update(self):
+        self.fc3.update()
+        self.fc2.update()
+        self.fc1.update()
 
 
 def objective(x):
