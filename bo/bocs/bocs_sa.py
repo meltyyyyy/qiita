@@ -261,7 +261,7 @@ def bocs_sa(objective, n_vars: np.int64, n_init: np.int64 = 10, n_trial: np.int6
         x_new = sa_X[max_idx, :]
 
         # evaluate model objective at new evaluation point
-        x_new = x_new.reshape((1, 15))
+        x_new = x_new.reshape((1, n_vars))
         y_new = objective(x_new)
 
         # Update posterior
