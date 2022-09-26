@@ -13,7 +13,7 @@ class Linear:
         self.db = None
 
     def forward(self, x):
-        self.x = x
+        self.x = x.reshape(x.shape[0], -1)
         y = np.dot(self.x, self.W) + self.b
         return y
 
@@ -103,7 +103,7 @@ def objective(x):
     return 10 * np.sin(3 * x) * np.exp(- x ** 2)
 
 
-if __name__ == "__main__":
+def plot_data():
     N = 50
     x_data = np.random.uniform(low=-2, high=2, size=N)
     y_data = objective(x_data) + np.random.normal(0, 1, size=N)
@@ -120,4 +120,32 @@ if __name__ == "__main__":
     ax.legend()
     plt.tight_layout()
     plt.savefig('data.png')
-    plt.close()
+    plt.close(fig)
+
+def train_nn(X_train, y_train, train_size, n_epochs=100):
+    assert X_train.shape[0] == train_size, "X_train.shape[0] and train_size does not match."
+
+    nn = MLP(input_size=1, hidden_size=50, output_size=1)
+    loss_list = []
+
+    for i in range(n_epochs):
+        y_pred = nn.forward(X_train)
+        loss = nn.loss(y_pred, y_train.reshape(train_size, -1))
+        loss_list.append(loss)
+        nn.backward()
+        nn.update()
+
+    return nn, loss_list
+
+
+if __name__ == "__main__":
+    plot_data()
+
+    train_size = 100
+    test_size = 100
+    X_train = np.random.uniform(low=-2, high=2, size=train_size)
+    y_train = objective(X_train) + np.random.normal(0, 1, size=train_size)
+    X_test = np.random.uniform(low=-2, high=2, size=test_size)
+    y_train = objective(X_test) + np.random.normal(0, 1, size=test_size)
+
+    train_nn(X_train, y_train, train_size=train_size)
