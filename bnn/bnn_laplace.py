@@ -124,6 +124,23 @@ def plot_data():
     plt.close(fig)
 
 
+def plot_model(model):
+    x_lins = np.linspace(-2, 2, 100)
+    y_pred = model.forward(x_lins)
+    y_lins = objective(x_lins)
+
+    # plot
+    fig = plt.figure(figsize=(8, 4))
+    plt.plot(x_lins, y_pred, 'o', markersize=2, label='prediction')
+    plt.plot(x_lins, y_lins, label='objective')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig('model.png')
+    plt.close(fig)
+
+
 def plot_history(loss_list):
     fig = plt.figure(figsize=(16, 8))
     plt.plot(loss_list, label='loss')
@@ -134,10 +151,10 @@ def plot_history(loss_list):
     plt.close(fig)
 
 
-def train_nn(X_train, y_train, train_size, n_epochs=20):
+def train_nn(X_train, y_train, train_size, n_epochs=100):
     assert X_train.shape[0] == train_size, "X_train.shape[0] and train_size does not match."
 
-    nn = MLP(input_size=1, hidden_size=64, output_size=1)
+    nn = MLP(input_size=1, hidden_size=128, output_size=1)
     loss_list = []
 
     for i in range(n_epochs):
@@ -172,3 +189,4 @@ if __name__ == "__main__":
     diff = y_test - y_pred
     score = (diff ** 2).sum() / len(diff)
     print(f'score : {score}')
+    plot_model(model)
