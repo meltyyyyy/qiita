@@ -87,3 +87,10 @@ GPLVMでは、潜在変数 <img src="https://latex.codecogs.com/gif.latex?\mathb
 
 ![bhs-tp](https://user-images.githubusercontent.com/81362789/190858012-b4fc8f44-046a-42e4-a315-b7a4d91ee0eb.png)
 
+## [組み合わせ構造に対するベイズ最適化](https://qiita.com/meltyyyyy/items/f92d911f551ceb32042a)
+
+非自明な関数の最大値、または最小値を求める手法は **Black-Box最適化** と呼ばれます。Black-Box最適化の中でもベイズの枠組みを用いて、関数の最大値、または最小値を求めていく方法を、 **ベイズ最適化(Bayesian Optimization)** と呼びます。
+
+ベイズ最適化を用いて組み合わせ最適化問題を解くには、 **獲得関数(Activation Function)** と **代理関数(Surrogate Function)** に工夫をし、高次元のスパースな解をうまく求められるようにする必要があります。
+
+この記事では **Bayesian Optimization of Combinatorial Structures(BOCS)** というアルゴリズムを原論文を引用する形で紹介します。
