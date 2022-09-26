@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('seaborn-pastel')
@@ -112,20 +113,31 @@ def plot_data():
     y_lins = objective(x_lins)
 
     # plot
-    fig, ax = plt.subplots(figsize=(8, 4))
-    ax.plot(x_data, y_data, 'o', markersize=2, label='observation')
-    ax.plot(x_lins, y_lins, label='objective')
-    ax.set_xlabel('$x$')
-    ax.set_ylabel('$y$')
-    ax.legend()
+    fig = plt.figure(figsize=(8, 4))
+    plt.plot(x_data, y_data, 'o', markersize=2, label='observation')
+    plt.plot(x_lins, y_lins, label='objective')
+    plt.xlabel('$x$')
+    plt.ylabel('$y$')
+    plt.legend()
     plt.tight_layout()
     plt.savefig('data.png')
     plt.close(fig)
 
-def train_nn(X_train, y_train, train_size, n_epochs=100):
+
+def plot_history(loss_list):
+    fig = plt.figure(figsize=(16, 8))
+    plt.plot(loss_list, label='loss')
+    plt.xlabel("iteration")
+    plt.ylabel("loss")
+    plt.tight_layout()
+    fig.savefig('history.png')
+    plt.close(fig)
+
+
+def train_nn(X_train, y_train, train_size, n_epochs=20):
     assert X_train.shape[0] == train_size, "X_train.shape[0] and train_size does not match."
 
-    nn = MLP(input_size=1, hidden_size=50, output_size=1)
+    nn = MLP(input_size=1, hidden_size=64, output_size=1)
     loss_list = []
 
     for i in range(n_epochs):
@@ -135,17 +147,28 @@ def train_nn(X_train, y_train, train_size, n_epochs=100):
         nn.backward()
         nn.update()
 
+        print(f'epoch{i} loss: {loss}')
+        time.sleep(0.05)
+
     return nn, loss_list
 
 
 if __name__ == "__main__":
     plot_data()
 
-    train_size = 100
+    train_size = 50
     test_size = 100
     X_train = np.random.uniform(low=-2, high=2, size=train_size)
     y_train = objective(X_train) + np.random.normal(0, 1, size=train_size)
     X_test = np.random.uniform(low=-2, high=2, size=test_size)
-    y_train = objective(X_test) + np.random.normal(0, 1, size=test_size)
+    y_test = objective(X_test) + np.random.normal(0, 1, size=test_size)
 
-    train_nn(X_train, y_train, train_size=train_size)
+    # train
+    model, loss_list = train_nn(X_train, y_train, train_size=train_size)
+    plot_history(loss_list)
+
+    # inference
+    y_pred = model.forward(X_test)
+    diff = y_test - y_pred
+    score = (diff ** 2).sum() / len(diff)
+    print(f'score : {score}')
